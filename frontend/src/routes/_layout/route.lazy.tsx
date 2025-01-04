@@ -11,7 +11,7 @@ function RouteComponent() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-card border-b pl-52 py-2">
-        <h1 className="text-xl px-4 font-bold capitalize">{pathname.split('/')[1] || 'projects'}</h1>
+        <h1 className="text-3xl px-4 font-bold capitalize">{pathname.split('/')[1] || 'projects'}</h1>
       </header>
       <aside className="bg-card min-h-screen overflow-y-auto w-52 fixed top-0 left-0 px-4 pb-4 flex flex-col gap-3 border-r">
         <img src={logo} alt="logo" className="w-full" />

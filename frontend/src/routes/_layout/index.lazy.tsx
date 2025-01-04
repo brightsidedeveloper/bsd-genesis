@@ -29,7 +29,7 @@ function RouteComponent() {
   const [projects, setProjects] = useState<GetProjectsType | null>(null)
 
   const refetch = useCallback(() => {
-    Go.getProjects().then((p) => setProjects(GetProjectsSchema.parse(p)))
+    Go.projects.get().then((p) => setProjects(GetProjectsSchema.parse(p)))
   }, [])
 
   useEffect(refetch, [refetch])
@@ -81,7 +81,7 @@ function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => voi
 
     const project = CreateProjectSchema.parse({ name: trimmedName, database, dir })
 
-    Go.createProject(project).then(() => {
+    Go.projects.create(project).then(() => {
       refetch()
       closeBtnRef.current?.click()
       toast({ title: 'Project Created', description: 'Your project has been created.' })

@@ -30,6 +30,20 @@ export namespace main {
 	        this.project = source["project"];
 	    }
 	}
+	export class ServerStatus {
+	    db: string;
+	    server: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ServerStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.db = source["db"];
+	        this.server = source["server"];
+	    }
+	}
 
 }
 

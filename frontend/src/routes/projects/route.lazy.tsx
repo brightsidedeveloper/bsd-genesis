@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link, Outlet, useNavigate, useParams } from '@tanstack/react-router'
+import { createLazyFileRoute, Link, Outlet, useNavigate } from '@tanstack/react-router'
 import logo from '@/assets/images/logo.png'
 import {
   Aperture,
@@ -25,10 +25,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { nameToDir } from '@/lib/utils'
-import { useMemo } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import Go from '@/Go'
+import useDirAndName from '@/hooks/useDirAndName'
 
 export const Route = createLazyFileRoute('/projects')({
   component: RouteComponent,
@@ -36,13 +35,13 @@ export const Route = createLazyFileRoute('/projects')({
 
 function RouteComponent() {
   const navigate = useNavigate()
-  const { name } = useParams({ strict: false })
-  const dir = useMemo(() => nameToDir(name), [name])
+  const { name, dir } = useDirAndName()
 
   const { toast } = useToast()
 
   function deleteProject() {
-    Go.deleteProject(dir)
+    Go.projects
+      .delete(dir)
       .then(() => {
         navigate({ to: '/' })
         toast({ title: name + ' deleted', description: '/Genesis/projects/' + dir })
@@ -53,7 +52,7 @@ function RouteComponent() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-card border-b pl-52 py-2">
-        <h1 className="text-xl px-4 font-bold capitalize">{name}</h1>
+        <h1 className="text-3xl px-4 font-bold capitalize">{name}</h1>
       </header>
       <aside className="bg-card min-h-screen overflow-y-auto w-52 fixed top-0 left-0 px-4 pb-4 flex flex-col gap-3 border-r">
         <img src={logo} alt="logo" className="w-full" />

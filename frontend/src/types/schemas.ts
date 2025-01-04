@@ -27,3 +27,10 @@ export const CreateProjectSchema = z.object({
 })
 
 export type CreateProjectType = z.infer<typeof CreateProjectSchema>
+
+export const GetServerStatusSchema = z.object({
+  db: z.union([z.literal('running'), z.literal('stopped')]),
+  server: z.union([z.literal('running'), z.literal('stopped')]),
+})
+
+export type GetServerStatusType = z.infer<typeof GetServerStatusSchema>

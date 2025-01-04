@@ -10,6 +10,30 @@ export function DeleteProject(arg1) {
   return window['go']['main']['App']['DeleteProject'](arg1);
 }
 
+export function GetPort(arg1) {
+  return window['go']['main']['App']['GetPort'](arg1);
+}
+
 export function GetProjects() {
   return window['go']['main']['App']['GetProjects']();
+}
+
+export function GetServerStatus(arg1) {
+  return window['go']['main']['App']['GetServerStatus'](arg1);
+}
+
+export function RestartServer(arg1) {
+  return window['go']['main']['App']['RestartServer'](arg1);
+}
+
+export function StartServer(arg1) {
+  return window['go']['main']['App']['StartServer'](arg1);
+}
+
+export function StopServer(arg1) {
+  return window['go']['main']['App']['StopServer'](arg1);
+}
+
+export function UpdatePort(arg1, arg2) {
+  return window['go']['main']['App']['UpdatePort'](arg1, arg2);
 }
