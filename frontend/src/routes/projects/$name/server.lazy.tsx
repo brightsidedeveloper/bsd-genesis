@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Go from '@/Go'
-import { useToast } from '@/hooks/use-toast'
 import useDirAndName from '@/hooks/useDirAndName'
 import { cn } from '@/lib/utils'
 import { GetServerStatusSchema, GetServerStatusType } from '@/types/schemas'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export const Route = createLazyFileRoute('/projects/$name/server')({
   component: RouteComponent,
@@ -15,7 +15,6 @@ export const Route = createLazyFileRoute('/projects/$name/server')({
 
 function RouteComponent() {
   const { dir, name } = useDirAndName()
-  const { toast } = useToast()
 
   const [starting, setStarting] = useState(false)
   const [stopping, setStopping] = useState(false)
@@ -55,24 +54,23 @@ function RouteComponent() {
   useEffect(refetchPort, [refetchPort])
 
   function updatePort() {
-    if (!port) return toast({ title: 'Port is empty', description: 'Port cannot be empty' })
+    if (!port) return toast('Port is empty', { description: 'Port cannot be empty' })
     Go.server.updatePort(dir, port).then(() => {
       refetchPort()
-      toast({
-        title: 'Port Updated',
+      toast('Port Updated', {
         description: 'Port updated to ' + port,
       })
+      if (status?.server === 'stopped') return
       Go.server
         .restartServer(dir)
-        .then(() =>
-          toast({
-            title: 'Server Restarted',
+        .then(() => {
+          refetchStatus()
+          toast('Server Restarted', {
             description: name + ' restarted on port ' + port,
           })
-        )
+        })
         .catch(() =>
-          toast({
-            title: 'Failed to Restart Server',
+          toast('Failed to Restart Server', {
             description: name + ' failed to restart',
           })
         )
@@ -118,14 +116,12 @@ function RouteComponent() {
               Go.server
                 .restartServer(dir)
                 .then(() =>
-                  toast({
-                    title: 'Server Restarted',
+                  toast('Server Restarted', {
                     description: name + ' restarted on port ' + port,
                   })
                 )
                 .catch(() =>
-                  toast({
-                    title: 'Failed to Restart Server',
+                  toast('Failed to Restart Server', {
                     description: name + ' failed to restart',
                   })
                 )
@@ -134,15 +130,15 @@ function RouteComponent() {
             setStarting(true)
             Go.server
               .start(dir)
-              .then(() =>
-                toast({
-                  title: 'Server started',
+              .then(() => {
+                refetchStatus()
+
+                toast('Server started', {
                   description: name + ' started on port ' + port,
                 })
-              )
+              })
               .catch(() =>
-                toast({
-                  title: 'Server failed to start',
+                toast('Server failed to start', {
                   description: name + ' failed to start',
                 })
               )
@@ -158,15 +154,15 @@ function RouteComponent() {
             setStopping(true)
             Go.server
               .stop(dir)
-              .then(() =>
-                toast({
-                  title: 'Server stopped',
+              .then(() => {
+                refetchStatus()
+
+                toast('Server stopped', {
                   description: name + ' stopped',
                 })
-              )
+              })
               .catch(() =>
-                toast({
-                  title: 'Server failed to stop',
+                toast('Server failed to stop', {
                   description: name + ' failed to stop',
                 })
               )

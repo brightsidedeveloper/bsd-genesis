@@ -25,9 +25,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { useToast } from '@/hooks/use-toast'
 import Go from '@/Go'
 import useDirAndName from '@/hooks/useDirAndName'
+import { toast } from 'sonner'
 
 export const Route = createLazyFileRoute('/projects')({
   component: RouteComponent,
@@ -37,22 +37,26 @@ function RouteComponent() {
   const navigate = useNavigate()
   const { name, dir } = useDirAndName()
 
-  const { toast } = useToast()
-
   function deleteProject() {
-    Go.projects
-      .delete(dir)
+    Go.server
+      .stop(dir)
       .then(() => {
-        navigate({ to: '/' })
-        toast({ title: name + ' deleted', description: '/Genesis/projects/' + dir })
+        toast('Server Stopped', { description: 'Server stopped for ' + name })
+        Go.projects
+          .delete(dir)
+          .then(() => {
+            navigate({ to: '/' })
+            toast(name + ' deleted', { description: '/Genesis/projects/' + dir })
+          })
+          .catch(() => toast('Error', { description: 'Failed to delete project' }))
       })
-      .catch(() => toast({ title: 'Error', description: 'Failed to delete project' }))
+      .catch(() => toast('Error', { description: 'Failed to stop server' }))
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-card border-b pl-52 py-2">
-        <h1 className="text-3xl px-4 font-bold capitalize">{name}</h1>
+        <h1 className="text-3xl px-4 font-bold">{name}</h1>
       </header>
       <aside className="bg-card min-h-screen overflow-y-auto w-52 fixed top-0 left-0 px-4 pb-4 flex flex-col gap-3 border-r">
         <img src={logo} alt="logo" className="w-full" />
@@ -134,9 +138,6 @@ const routes = [
 
 // Next Steps:
 
-// 1. Setup the Server & Database Docker Containers
-// 2. Setup a Web Client
-// 3. Make Genesis Generate this on new project creation
 // 4. Setup Client Spawner in App
 // 5. Setup APEX
 // 6. Setup Authentication

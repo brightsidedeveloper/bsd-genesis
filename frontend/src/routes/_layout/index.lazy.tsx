@@ -17,9 +17,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { GetProjectsType, GetProjectsSchema, CreateProjectSchema } from '@/types/schemas'
-import { useToast } from '@/hooks/use-toast'
 import Go from '@/Go'
 import { nameToDir } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export const Route = createLazyFileRoute('/_layout/')({
   component: RouteComponent,
@@ -64,27 +64,25 @@ function RouteComponent() {
 }
 
 function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => void; projectDirAndNameTuple: string[][] }) {
-  const { toast } = useToast()
-
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
   const [name, setName] = useState('')
   const [database, setDatabase] = useState<'postgres' | ''>('')
 
   function handleSubmit() {
-    if (!name) return toast({ title: 'Name is Required ', description: 'Please fill out all fields.' })
-    if (!database) return toast({ title: 'Database is Required', description: 'Please fill out all fields.' })
+    if (!name) return toast('Name is Required ', { description: 'Please fill out all fields.' })
+    if (!database) return toast('Database is Required', { description: 'Please fill out all fields.' })
     const trimmedName = name.trim()
     const dir = nameToDir(trimmedName)
     if (projectDirAndNameTuple.some(([d, n]) => d === dir || n.toLowerCase().includes(trimmedName.toLowerCase())))
-      return toast({ title: 'Project Already Exists', description: 'Please choose a different name.' })
+      return toast('Project Already Exists', { description: 'Please choose a different name.' })
 
     const project = CreateProjectSchema.parse({ name: trimmedName, database, dir })
 
     Go.projects.create(project).then(() => {
       refetch()
       closeBtnRef.current?.click()
-      toast({ title: 'Project Created', description: 'Your project has been created.' })
+      toast('Project Created', { description: 'Your project has been created.' })
     })
   }
 
