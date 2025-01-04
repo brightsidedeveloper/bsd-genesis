@@ -2,26 +2,38 @@ package main
 
 import (
 	"context"
-	"fmt"
 )
 
-// App struct
 type App struct {
-	ctx context.Context
+	ctx         context.Context
+	ProjectsDir string
 }
 
-// NewApp creates a new App application struct
 func NewApp() *App {
-	return &App{}
+	return &App{
+		ProjectsDir: "projects",
+	}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+type ProjectData map[string]interface{}
+type ProjectInfo struct {
+	Dir     string      `json:"dir"`
+	Project ProjectData `json:"project"`
+}
+
+func (a *App) GetProjects() []ProjectInfo {
+	if err := ensureDir(a.ProjectsDir); err != nil {
+		return nil
+	}
+
+	projects, err := getProjectMetadata(a.ProjectsDir)
+	if err != nil {
+		return nil
+	}
+
+	return projects
 }

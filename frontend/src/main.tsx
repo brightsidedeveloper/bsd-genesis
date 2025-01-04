@@ -5,6 +5,7 @@ import './index.css'
 import { routeTree } from './routeTree.gen'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from './components/theme-provider'
 
 const qc = new QueryClient()
 
@@ -16,12 +17,14 @@ declare module '@tanstack/react-router' {
   }
 }
 
-const container = document.getElementById('root')
-const root = createRoot(container!)
+const div = document.getElementById('root')
+const root = createRoot(div!)
 root.render(
   <React.StrictMode>
-    <QueryClientProvider client={qc}>
-      <RouterProvider router={r} />
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <QueryClientProvider client={qc}>
+        <RouterProvider router={r} />
+      </QueryClientProvider>
+    </ThemeProvider>
   </React.StrictMode>
 )

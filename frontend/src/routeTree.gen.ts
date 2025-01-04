@@ -16,60 +16,242 @@ import { Route as rootRoute } from './routes/__root'
 
 // Create Virtual Routes
 
-const IndexLazyImport = createFileRoute('/')()
+const ProjectsRouteLazyImport = createFileRoute('/projects')()
+const LayoutRouteLazyImport = createFileRoute('/_layout')()
+const LayoutIndexLazyImport = createFileRoute('/_layout/')()
+const ProjectsNewLazyImport = createFileRoute('/projects/new')()
+const ProjectsDirLazyImport = createFileRoute('/projects/$dir')()
+const LayoutSettingsLazyImport = createFileRoute('/_layout/settings')()
+const LayoutPackagesLazyImport = createFileRoute('/_layout/packages')()
+const LayoutModulesLazyImport = createFileRoute('/_layout/modules')()
 
 // Create/Update Routes
 
-const IndexLazyRoute = IndexLazyImport.update({
+const ProjectsRouteLazyRoute = ProjectsRouteLazyImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/projects/route.lazy').then((d) => d.Route),
+)
+
+const LayoutRouteLazyRoute = LayoutRouteLazyImport.update({
+  id: '/_layout',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/_layout/route.lazy').then((d) => d.Route))
+
+const LayoutIndexLazyRoute = LayoutIndexLazyImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() => import('./routes/_layout/index.lazy').then((d) => d.Route))
+
+const ProjectsNewLazyRoute = ProjectsNewLazyImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() => import('./routes/projects/new.lazy').then((d) => d.Route))
+
+const ProjectsDirLazyRoute = ProjectsDirLazyImport.update({
+  id: '/$dir',
+  path: '/$dir',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() => import('./routes/projects/$dir.lazy').then((d) => d.Route))
+
+const LayoutSettingsLazyRoute = LayoutSettingsLazyImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_layout/settings.lazy').then((d) => d.Route),
+)
+
+const LayoutPackagesLazyRoute = LayoutPackagesLazyImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_layout/packages.lazy').then((d) => d.Route),
+)
+
+const LayoutModulesLazyRoute = LayoutModulesLazyImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_layout/modules.lazy').then((d) => d.Route),
+)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_layout': {
+      id: '/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutRouteLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/_layout/modules': {
+      id: '/_layout/modules'
+      path: '/modules'
+      fullPath: '/modules'
+      preLoaderRoute: typeof LayoutModulesLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
+    }
+    '/_layout/packages': {
+      id: '/_layout/packages'
+      path: '/packages'
+      fullPath: '/packages'
+      preLoaderRoute: typeof LayoutPackagesLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
+    }
+    '/_layout/settings': {
+      id: '/_layout/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof LayoutSettingsLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
+    }
+    '/projects/$dir': {
+      id: '/projects/$dir'
+      path: '/$dir'
+      fullPath: '/projects/$dir'
+      preLoaderRoute: typeof ProjectsDirLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/new': {
+      id: '/projects/new'
+      path: '/new'
+      fullPath: '/projects/new'
+      preLoaderRoute: typeof ProjectsNewLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/_layout/': {
+      id: '/_layout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof LayoutIndexLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface LayoutRouteLazyRouteChildren {
+  LayoutModulesLazyRoute: typeof LayoutModulesLazyRoute
+  LayoutPackagesLazyRoute: typeof LayoutPackagesLazyRoute
+  LayoutSettingsLazyRoute: typeof LayoutSettingsLazyRoute
+  LayoutIndexLazyRoute: typeof LayoutIndexLazyRoute
+}
+
+const LayoutRouteLazyRouteChildren: LayoutRouteLazyRouteChildren = {
+  LayoutModulesLazyRoute: LayoutModulesLazyRoute,
+  LayoutPackagesLazyRoute: LayoutPackagesLazyRoute,
+  LayoutSettingsLazyRoute: LayoutSettingsLazyRoute,
+  LayoutIndexLazyRoute: LayoutIndexLazyRoute,
+}
+
+const LayoutRouteLazyRouteWithChildren = LayoutRouteLazyRoute._addFileChildren(
+  LayoutRouteLazyRouteChildren,
+)
+
+interface ProjectsRouteLazyRouteChildren {
+  ProjectsDirLazyRoute: typeof ProjectsDirLazyRoute
+  ProjectsNewLazyRoute: typeof ProjectsNewLazyRoute
+}
+
+const ProjectsRouteLazyRouteChildren: ProjectsRouteLazyRouteChildren = {
+  ProjectsDirLazyRoute: ProjectsDirLazyRoute,
+  ProjectsNewLazyRoute: ProjectsNewLazyRoute,
+}
+
+const ProjectsRouteLazyRouteWithChildren =
+  ProjectsRouteLazyRoute._addFileChildren(ProjectsRouteLazyRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
+  '': typeof LayoutRouteLazyRouteWithChildren
+  '/projects': typeof ProjectsRouteLazyRouteWithChildren
+  '/modules': typeof LayoutModulesLazyRoute
+  '/packages': typeof LayoutPackagesLazyRoute
+  '/settings': typeof LayoutSettingsLazyRoute
+  '/projects/$dir': typeof ProjectsDirLazyRoute
+  '/projects/new': typeof ProjectsNewLazyRoute
+  '/': typeof LayoutIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
+  '/projects': typeof ProjectsRouteLazyRouteWithChildren
+  '/modules': typeof LayoutModulesLazyRoute
+  '/packages': typeof LayoutPackagesLazyRoute
+  '/settings': typeof LayoutSettingsLazyRoute
+  '/projects/$dir': typeof ProjectsDirLazyRoute
+  '/projects/new': typeof ProjectsNewLazyRoute
+  '/': typeof LayoutIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
+  '/_layout': typeof LayoutRouteLazyRouteWithChildren
+  '/projects': typeof ProjectsRouteLazyRouteWithChildren
+  '/_layout/modules': typeof LayoutModulesLazyRoute
+  '/_layout/packages': typeof LayoutPackagesLazyRoute
+  '/_layout/settings': typeof LayoutSettingsLazyRoute
+  '/projects/$dir': typeof ProjectsDirLazyRoute
+  '/projects/new': typeof ProjectsNewLazyRoute
+  '/_layout/': typeof LayoutIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | ''
+    | '/projects'
+    | '/modules'
+    | '/packages'
+    | '/settings'
+    | '/projects/$dir'
+    | '/projects/new'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/projects'
+    | '/modules'
+    | '/packages'
+    | '/settings'
+    | '/projects/$dir'
+    | '/projects/new'
+    | '/'
+  id:
+    | '__root__'
+    | '/_layout'
+    | '/projects'
+    | '/_layout/modules'
+    | '/_layout/packages'
+    | '/_layout/settings'
+    | '/projects/$dir'
+    | '/projects/new'
+    | '/_layout/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
+  LayoutRouteLazyRoute: typeof LayoutRouteLazyRouteWithChildren
+  ProjectsRouteLazyRoute: typeof ProjectsRouteLazyRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  LayoutRouteLazyRoute: LayoutRouteLazyRouteWithChildren,
+  ProjectsRouteLazyRoute: ProjectsRouteLazyRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -82,11 +264,49 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/_layout",
+        "/projects"
       ]
     },
-    "/": {
-      "filePath": "index.lazy.tsx"
+    "/_layout": {
+      "filePath": "_layout/route.lazy.tsx",
+      "children": [
+        "/_layout/modules",
+        "/_layout/packages",
+        "/_layout/settings",
+        "/_layout/"
+      ]
+    },
+    "/projects": {
+      "filePath": "projects/route.lazy.tsx",
+      "children": [
+        "/projects/$dir",
+        "/projects/new"
+      ]
+    },
+    "/_layout/modules": {
+      "filePath": "_layout/modules.lazy.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/packages": {
+      "filePath": "_layout/packages.lazy.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/settings": {
+      "filePath": "_layout/settings.lazy.tsx",
+      "parent": "/_layout"
+    },
+    "/projects/$dir": {
+      "filePath": "projects/$dir.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/new": {
+      "filePath": "projects/new.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/_layout/": {
+      "filePath": "_layout/index.lazy.tsx",
+      "parent": "/_layout"
     }
   }
 }
