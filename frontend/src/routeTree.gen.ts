@@ -30,6 +30,7 @@ const ProjectsNameQueriesLazyImport = createFileRoute(
 )()
 const ProjectsNameQ1LazyImport = createFileRoute('/projects/$name/q1')()
 const ProjectsNameGpackLazyImport = createFileRoute('/projects/$name/gpack')()
+const ProjectsNameGitLazyImport = createFileRoute('/projects/$name/git')()
 const ProjectsNameDeployLazyImport = createFileRoute('/projects/$name/deploy')()
 const ProjectsNameClientsLazyImport = createFileRoute(
   '/projects/$name/clients',
@@ -128,6 +129,14 @@ const ProjectsNameGpackLazyRoute = ProjectsNameGpackLazyImport.update({
   getParentRoute: () => ProjectsRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/projects/$name/gpack.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameGitLazyRoute = ProjectsNameGitLazyImport.update({
+  id: '/$name/git',
+  path: '/$name/git',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/git.lazy').then((d) => d.Route),
 )
 
 const ProjectsNameDeployLazyRoute = ProjectsNameDeployLazyImport.update({
@@ -236,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsNameDeployLazyImport
       parentRoute: typeof ProjectsRouteLazyImport
     }
+    '/projects/$name/git': {
+      id: '/projects/$name/git'
+      path: '/$name/git'
+      fullPath: '/projects/$name/git'
+      preLoaderRoute: typeof ProjectsNameGitLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
     '/projects/$name/gpack': {
       id: '/projects/$name/gpack'
       path: '/$name/gpack'
@@ -306,6 +322,7 @@ interface ProjectsRouteLazyRouteChildren {
   ProjectsNameAuthLazyRoute: typeof ProjectsNameAuthLazyRoute
   ProjectsNameClientsLazyRoute: typeof ProjectsNameClientsLazyRoute
   ProjectsNameDeployLazyRoute: typeof ProjectsNameDeployLazyRoute
+  ProjectsNameGitLazyRoute: typeof ProjectsNameGitLazyRoute
   ProjectsNameGpackLazyRoute: typeof ProjectsNameGpackLazyRoute
   ProjectsNameQ1LazyRoute: typeof ProjectsNameQ1LazyRoute
   ProjectsNameQueriesLazyRoute: typeof ProjectsNameQueriesLazyRoute
@@ -319,6 +336,7 @@ const ProjectsRouteLazyRouteChildren: ProjectsRouteLazyRouteChildren = {
   ProjectsNameAuthLazyRoute: ProjectsNameAuthLazyRoute,
   ProjectsNameClientsLazyRoute: ProjectsNameClientsLazyRoute,
   ProjectsNameDeployLazyRoute: ProjectsNameDeployLazyRoute,
+  ProjectsNameGitLazyRoute: ProjectsNameGitLazyRoute,
   ProjectsNameGpackLazyRoute: ProjectsNameGpackLazyRoute,
   ProjectsNameQ1LazyRoute: ProjectsNameQ1LazyRoute,
   ProjectsNameQueriesLazyRoute: ProjectsNameQueriesLazyRoute,
@@ -341,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
+  '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
@@ -359,6 +378,7 @@ export interface FileRoutesByTo {
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
+  '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
@@ -379,6 +399,7 @@ export interface FileRoutesById {
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
+  '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
@@ -400,6 +421,7 @@ export interface FileRouteTypes {
     | '/projects/$name/auth'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
+    | '/projects/$name/git'
     | '/projects/$name/gpack'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
@@ -417,6 +439,7 @@ export interface FileRouteTypes {
     | '/projects/$name/auth'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
+    | '/projects/$name/git'
     | '/projects/$name/gpack'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
@@ -435,6 +458,7 @@ export interface FileRouteTypes {
     | '/projects/$name/auth'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
+    | '/projects/$name/git'
     | '/projects/$name/gpack'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
@@ -484,6 +508,7 @@ export const routeTree = rootRoute
         "/projects/$name/auth",
         "/projects/$name/clients",
         "/projects/$name/deploy",
+        "/projects/$name/git",
         "/projects/$name/gpack",
         "/projects/$name/q1",
         "/projects/$name/queries",
@@ -522,6 +547,10 @@ export const routeTree = rootRoute
     },
     "/projects/$name/deploy": {
       "filePath": "projects/$name/deploy.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/git": {
+      "filePath": "projects/$name/git.lazy.tsx",
       "parent": "/projects"
     },
     "/projects/$name/gpack": {

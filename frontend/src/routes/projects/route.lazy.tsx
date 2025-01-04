@@ -5,12 +5,13 @@ import {
   AppWindowMac,
   ArrowLeft,
   Database,
+  GitGraph,
   Package,
   PcCase,
   Replace,
   Ship,
-  SquareChartGantt,
   Table,
+  TableOfContents,
   Trash,
   Users,
 } from 'lucide-react'
@@ -124,15 +125,16 @@ function RouteComponent() {
 }
 
 const routes = [
-  { to: '/projects/$name', label: 'Overview', Icon: SquareChartGantt },
-  { to: '/projects/$name/apex', label: 'APEX', Icon: Aperture },
+  { to: '/projects/$name', label: 'Overview', Icon: TableOfContents },
   { to: '/projects/$name/server', label: 'Server', Icon: PcCase },
   { to: '/projects/$name/clients', label: 'Clients', Icon: AppWindowMac },
+  { to: '/projects/$name/apex', label: 'APEX', Icon: Aperture },
   { to: '/projects/$name/auth', label: 'Authentication', Icon: Users },
   { to: '/projects/$name/tables', label: 'Tables', Icon: Table },
   { to: '/projects/$name/queries', label: 'Queries', Icon: Replace },
   { to: '/projects/$name/q1', label: 'Q1 Storage', Icon: Database },
   { to: '/projects/$name/gpack', label: 'G-Pack', Icon: Package },
+  { to: '/projects/$name/git', label: 'Git', Icon: GitGraph },
   { to: '/projects/$name/deploy', label: 'Deploy', Icon: Ship },
 ] as const
 

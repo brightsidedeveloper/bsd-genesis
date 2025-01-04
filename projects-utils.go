@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 func ensureDir(dir string) error {
@@ -127,6 +128,12 @@ func copyTemplate(srcDir, destDir string) error {
 	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
+		}
+
+		// ✅ Skip the `.git` directory and its contents
+		if info.IsDir() && strings.HasSuffix(path, ".git") {
+			fmt.Println("🚫 Skipping .git directory:", path)
+			return filepath.SkipDir
 		}
 
 		relPath, err := filepath.Rel(srcDir, path)

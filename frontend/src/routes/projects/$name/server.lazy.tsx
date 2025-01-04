@@ -16,8 +16,8 @@ export const Route = createLazyFileRoute('/projects/$name/server')({
 function RouteComponent() {
   const { dir, name } = useDirAndName()
 
-  const [starting, setStarting] = useState(false)
-  const [stopping, setStopping] = useState(false)
+  const [starting, setStarting] = useState(true)
+  const [stopping, setStopping] = useState(true)
 
   const [status, setStatus] = useState<GetServerStatusType | null>(null)
   const refetchStatus = useCallback(() => {
@@ -33,8 +33,11 @@ function RouteComponent() {
   }, [refetchStatus])
 
   useEffect(() => {
-    setStarting(false)
-    setStopping(false)
+    const t = setTimeout(() => {
+      setStarting(false)
+      setStopping(false)
+    }, 100)
+    return () => clearTimeout(t)
   }, [status?.db, status?.server])
 
   const [port, setPort] = useState('')
@@ -85,13 +88,13 @@ function RouteComponent() {
       <div className="flex space-x-4 items-center">
         <Label>Server: </Label>
         <span className={cn('capitalize', status && (status.server === 'running' ? 'text-green-500' : 'text-destructive'))}>
-          {status ? status.server : 'Loading'}
+          {status ? status.server : ''}
         </span>
       </div>
       <div className="flex space-x-4 items-center">
         <Label>Database: </Label>
         <span className={cn('capitalize', status && (status.db === 'running' ? 'text-green-500' : 'text-destructive'))}>
-          {status ? status.db : 'Loading'}
+          {status ? status.db : ''}
         </span>
       </div>
       <div className="flex space-x-4 items-center">

@@ -34,3 +34,12 @@ export const GetServerStatusSchema = z.object({
 })
 
 export type GetServerStatusType = z.infer<typeof GetServerStatusSchema>
+
+export const GetClientAppsSchema = z.array(
+  z.object({
+    type: z.union([z.literal('web'), z.literal('mobile'), z.literal('desktop')]),
+    exists: z.boolean(),
+  })
+)
+
+export type GetClientAppsType = z.infer<typeof GetClientAppsSchema>
