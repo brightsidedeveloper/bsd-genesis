@@ -56,37 +56,31 @@ type NewProjectOptions struct {
 }
 
 func (a *App) CreateProject(o NewProjectOptions) error {
-	if len(o.Dir) == 0 {
-		return fmt.Errorf("❌ Project directory cannot be empty")
+	// Validate input parameters
+	if err := validateProjectOptions(o); err != nil {
+		return err
 	}
 
 	projectPath := filepath.Join(a.ProjectsDir, o.Dir)
 
-	// Ensure the directory does not already exist
-	if _, err := os.Stat(projectPath); err == nil {
-		return fmt.Errorf("❌ Project directory already exists: %s", projectPath)
+	// Ensure the project directory does not already exist
+	if err := checkIfProjectExists(projectPath); err != nil {
+		return err
 	}
 
-	// Create project directory
-	if err := ensureDir(projectPath); err != nil {
-		return fmt.Errorf("❌ Failed to create project directory: %v", err)
+	// Copy project template to new directory
+	templatePath := filepath.Join("universe", "bsd-solar-system") // Change path if needed
+	if err := copyTemplate(templatePath, projectPath); err != nil {
+		return fmt.Errorf("❌ Failed to copy template: %v", err)
 	}
 
-	if len(o.Name) == 0 {
-		return fmt.Errorf("❌ Project name cannot be empty")
-	}
-
-	if len(o.Database) == 0 {
-		return fmt.Errorf("❌ Database name cannot be empty")
-	}
-
-	// Create the project.json file
+	// Create and write project.json with correct metadata
+	projectFilePath := filepath.Join(projectPath, "project.json")
 	projectData := ProjectData{
 		"name":     o.Name,
-		"database": o.Database, // Default database, can be changed as needed
+		"database": o.Database,
 	}
 
-	projectFilePath := filepath.Join(projectPath, "project.json")
 	if err := writeProjectJSON(projectFilePath, projectData); err != nil {
 		return fmt.Errorf("❌ Failed to write project.json: %v", err)
 	}

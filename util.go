@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -94,10 +95,66 @@ func writeProjectJSON(filePath string, data ProjectData) error {
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ") // Pretty print JSON
-	if err := encoder.Encode(data); err != nil {
+	encoder.SetIndent("", "  ")
+	return encoder.Encode(data)
+}
+
+func validateProjectOptions(o NewProjectOptions) error {
+	if len(o.Dir) == 0 {
+		return fmt.Errorf("❌ Project directory cannot be empty")
+	}
+	if len(o.Name) == 0 {
+		return fmt.Errorf("❌ Project name cannot be empty")
+	}
+	if len(o.Database) == 0 {
+		return fmt.Errorf("❌ Database name cannot be empty")
+	}
+	return nil
+}
+
+func checkIfProjectExists(projectPath string) error {
+	if _, err := os.Stat(projectPath); err == nil {
+		return fmt.Errorf("❌ Project directory already exists: %s", projectPath)
+	}
+	return nil
+}
+
+func copyTemplate(srcDir, destDir string) error {
+	if err := ensureDir(destDir); err != nil {
 		return err
 	}
 
-	return nil
+	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		relPath, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+		destPath := filepath.Join(destDir, relPath)
+
+		if info.IsDir() {
+			return ensureDir(destPath)
+		}
+		return copyFile(path, destPath)
+	})
+}
+
+func copyFile(src, dest string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, sourceFile)
+	return err
 }
