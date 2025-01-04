@@ -1,28 +1,46 @@
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { GetProjects } from '../../../wailsjs/go/main/App'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { GetProjectsType, GetProjectsSchema, CreateProjectSchema } from '@/types/schemas'
+import { useToast } from '@/hooks/use-toast'
+import Go from '@/Go'
+import { nameToDir } from '@/lib/utils'
 
 export const Route = createLazyFileRoute('/_layout/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const [projects, setProjects] = useState<ProjectData[] | null>(null)
+  const [projects, setProjects] = useState<GetProjectsType | null>(null)
 
-  useEffect(() => {
-    GetProjects().then((p) => setProjects((p as ProjectData[]) ?? []))
+  const refetch = useCallback(() => {
+    Go.getProjects().then((p) => setProjects(GetProjectsSchema.parse(p)))
   }, [])
 
-  if (!projects) return null
+  useEffect(refetch, [refetch])
+
+  const projectDirAndNameTuple = useMemo(() => projects?.map(({ dir, project: { name } }) => [dir, name]) ?? [], [projects])
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {projects.map(({ dir, project: { name, description } }) => (
-        <Link key={dir} to="/projects/$dir" params={{ dir }}>
-          <Card>
+      {projects?.map(({ dir, project: { name, description } }) => (
+        <Link key={dir} to="/projects/$name" params={{ name }}>
+          <Card className="h-full flex flex-col justify-between">
             <CardHeader>
               <CardTitle>{name}</CardTitle>
               <CardDescription>{description}</CardDescription>
@@ -33,21 +51,77 @@ function RouteComponent() {
           </Card>
         </Link>
       ))}
-      <Link to="/projects/new" className="group">
-        <Card className="size-full flex items-center justify-center border-dashed min-h-32">
-          <Plus className="group-hover:opacity-100 opacity-70" />
-        </Card>
-      </Link>
+      <Dialog>
+        <DialogTrigger>
+          <Card className="size-full flex items-center justify-center border-dashed min-h-40">
+            <Plus className="group-hover:opacity-100 opacity-70" />
+          </Card>
+        </DialogTrigger>
+        <CreateProject refetch={refetch} projectDirAndNameTuple={projectDirAndNameTuple} />
+      </Dialog>
     </div>
   )
 }
 
-type ProjectData = {
-  dir: string
-  project: Project
-}
+function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => void; projectDirAndNameTuple: string[][] }) {
+  const { toast } = useToast()
 
-type Project = {
-  name: string
-  description?: string
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
+
+  const [name, setName] = useState('')
+  const [database, setDatabase] = useState<'postgres' | ''>('')
+
+  function handleSubmit() {
+    if (!name) return toast({ title: 'Name is Required ', description: 'Please fill out all fields.' })
+    if (!database) return toast({ title: 'Database is Required', description: 'Please fill out all fields.' })
+    const trimmedName = name.trim()
+    const dir = nameToDir(trimmedName)
+    if (projectDirAndNameTuple.some(([d, n]) => d === dir || n.toLowerCase().includes(trimmedName.toLowerCase())))
+      return toast({ title: 'Project Already Exists', description: 'Please choose a different name.' })
+
+    const project = CreateProjectSchema.parse({ name: trimmedName, database, dir })
+
+    Go.createProject(project).then(() => {
+      refetch()
+      closeBtnRef.current?.click()
+      toast({ title: 'Project Created', description: 'Your project has been created.' })
+    })
+  }
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>New Project</DialogTitle>
+        <DialogDescription>Name your project, choose a database and launch it!</DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="name" className="text-right">
+            Name
+          </Label>
+          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="BrightSide Portal" className="col-span-3" />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right">Database</Label>
+          <Select value={database} onValueChange={(db: 'postgres') => setDatabase(db)}>
+            <SelectTrigger className="col-span-3">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Database</SelectLabel>
+                <SelectItem value="postgres">Postgres</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <DialogFooter>
+        <Button onClick={handleSubmit} type="submit" disabled={!name || !database}>
+          Save changes
+        </Button>
+      </DialogFooter>
+      <DialogClose className="hidden" ref={closeBtnRef} />
+    </DialogContent>
+  )
 }

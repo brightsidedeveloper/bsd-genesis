@@ -19,11 +19,23 @@ import { Route as rootRoute } from './routes/__root'
 const ProjectsRouteLazyImport = createFileRoute('/projects')()
 const LayoutRouteLazyImport = createFileRoute('/_layout')()
 const LayoutIndexLazyImport = createFileRoute('/_layout/')()
-const ProjectsNewLazyImport = createFileRoute('/projects/new')()
-const ProjectsDirLazyImport = createFileRoute('/projects/$dir')()
 const LayoutSettingsLazyImport = createFileRoute('/_layout/settings')()
 const LayoutPackagesLazyImport = createFileRoute('/_layout/packages')()
 const LayoutModulesLazyImport = createFileRoute('/_layout/modules')()
+const ProjectsNameIndexLazyImport = createFileRoute('/projects/$name/')()
+const ProjectsNameTablesLazyImport = createFileRoute('/projects/$name/tables')()
+const ProjectsNameServerLazyImport = createFileRoute('/projects/$name/server')()
+const ProjectsNameQueriesLazyImport = createFileRoute(
+  '/projects/$name/queries',
+)()
+const ProjectsNameQ1LazyImport = createFileRoute('/projects/$name/q1')()
+const ProjectsNameGpackLazyImport = createFileRoute('/projects/$name/gpack')()
+const ProjectsNameDeployLazyImport = createFileRoute('/projects/$name/deploy')()
+const ProjectsNameClientsLazyImport = createFileRoute(
+  '/projects/$name/clients',
+)()
+const ProjectsNameAuthLazyImport = createFileRoute('/projects/$name/auth')()
+const ProjectsNameApexLazyImport = createFileRoute('/projects/$name/apex')()
 
 // Create/Update Routes
 
@@ -45,18 +57,6 @@ const LayoutIndexLazyRoute = LayoutIndexLazyImport.update({
   path: '/',
   getParentRoute: () => LayoutRouteLazyRoute,
 } as any).lazy(() => import('./routes/_layout/index.lazy').then((d) => d.Route))
-
-const ProjectsNewLazyRoute = ProjectsNewLazyImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => ProjectsRouteLazyRoute,
-} as any).lazy(() => import('./routes/projects/new.lazy').then((d) => d.Route))
-
-const ProjectsDirLazyRoute = ProjectsDirLazyImport.update({
-  id: '/$dir',
-  path: '/$dir',
-  getParentRoute: () => ProjectsRouteLazyRoute,
-} as any).lazy(() => import('./routes/projects/$dir.lazy').then((d) => d.Route))
 
 const LayoutSettingsLazyRoute = LayoutSettingsLazyImport.update({
   id: '/settings',
@@ -80,6 +80,86 @@ const LayoutModulesLazyRoute = LayoutModulesLazyImport.update({
   getParentRoute: () => LayoutRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_layout/modules.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameIndexLazyRoute = ProjectsNameIndexLazyImport.update({
+  id: '/$name/',
+  path: '/$name/',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/index.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameTablesLazyRoute = ProjectsNameTablesLazyImport.update({
+  id: '/$name/tables',
+  path: '/$name/tables',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/tables.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameServerLazyRoute = ProjectsNameServerLazyImport.update({
+  id: '/$name/server',
+  path: '/$name/server',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/server.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameQueriesLazyRoute = ProjectsNameQueriesLazyImport.update({
+  id: '/$name/queries',
+  path: '/$name/queries',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/queries.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameQ1LazyRoute = ProjectsNameQ1LazyImport.update({
+  id: '/$name/q1',
+  path: '/$name/q1',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/q1.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameGpackLazyRoute = ProjectsNameGpackLazyImport.update({
+  id: '/$name/gpack',
+  path: '/$name/gpack',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/gpack.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameDeployLazyRoute = ProjectsNameDeployLazyImport.update({
+  id: '/$name/deploy',
+  path: '/$name/deploy',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/deploy.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameClientsLazyRoute = ProjectsNameClientsLazyImport.update({
+  id: '/$name/clients',
+  path: '/$name/clients',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/clients.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameAuthLazyRoute = ProjectsNameAuthLazyImport.update({
+  id: '/$name/auth',
+  path: '/$name/auth',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/auth.lazy').then((d) => d.Route),
+)
+
+const ProjectsNameApexLazyRoute = ProjectsNameApexLazyImport.update({
+  id: '/$name/apex',
+  path: '/$name/apex',
+  getParentRoute: () => ProjectsRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/apex.lazy').then((d) => d.Route),
 )
 
 // Populate the FileRoutesByPath interface
@@ -121,26 +201,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSettingsLazyImport
       parentRoute: typeof LayoutRouteLazyImport
     }
-    '/projects/$dir': {
-      id: '/projects/$dir'
-      path: '/$dir'
-      fullPath: '/projects/$dir'
-      preLoaderRoute: typeof ProjectsDirLazyImport
-      parentRoute: typeof ProjectsRouteLazyImport
-    }
-    '/projects/new': {
-      id: '/projects/new'
-      path: '/new'
-      fullPath: '/projects/new'
-      preLoaderRoute: typeof ProjectsNewLazyImport
-      parentRoute: typeof ProjectsRouteLazyImport
-    }
     '/_layout/': {
       id: '/_layout/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexLazyImport
       parentRoute: typeof LayoutRouteLazyImport
+    }
+    '/projects/$name/apex': {
+      id: '/projects/$name/apex'
+      path: '/$name/apex'
+      fullPath: '/projects/$name/apex'
+      preLoaderRoute: typeof ProjectsNameApexLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/auth': {
+      id: '/projects/$name/auth'
+      path: '/$name/auth'
+      fullPath: '/projects/$name/auth'
+      preLoaderRoute: typeof ProjectsNameAuthLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/clients': {
+      id: '/projects/$name/clients'
+      path: '/$name/clients'
+      fullPath: '/projects/$name/clients'
+      preLoaderRoute: typeof ProjectsNameClientsLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/deploy': {
+      id: '/projects/$name/deploy'
+      path: '/$name/deploy'
+      fullPath: '/projects/$name/deploy'
+      preLoaderRoute: typeof ProjectsNameDeployLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/gpack': {
+      id: '/projects/$name/gpack'
+      path: '/$name/gpack'
+      fullPath: '/projects/$name/gpack'
+      preLoaderRoute: typeof ProjectsNameGpackLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/q1': {
+      id: '/projects/$name/q1'
+      path: '/$name/q1'
+      fullPath: '/projects/$name/q1'
+      preLoaderRoute: typeof ProjectsNameQ1LazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/queries': {
+      id: '/projects/$name/queries'
+      path: '/$name/queries'
+      fullPath: '/projects/$name/queries'
+      preLoaderRoute: typeof ProjectsNameQueriesLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/server': {
+      id: '/projects/$name/server'
+      path: '/$name/server'
+      fullPath: '/projects/$name/server'
+      preLoaderRoute: typeof ProjectsNameServerLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/tables': {
+      id: '/projects/$name/tables'
+      path: '/$name/tables'
+      fullPath: '/projects/$name/tables'
+      preLoaderRoute: typeof ProjectsNameTablesLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
+    }
+    '/projects/$name/': {
+      id: '/projects/$name/'
+      path: '/$name'
+      fullPath: '/projects/$name'
+      preLoaderRoute: typeof ProjectsNameIndexLazyImport
+      parentRoute: typeof ProjectsRouteLazyImport
     }
   }
 }
@@ -166,13 +302,29 @@ const LayoutRouteLazyRouteWithChildren = LayoutRouteLazyRoute._addFileChildren(
 )
 
 interface ProjectsRouteLazyRouteChildren {
-  ProjectsDirLazyRoute: typeof ProjectsDirLazyRoute
-  ProjectsNewLazyRoute: typeof ProjectsNewLazyRoute
+  ProjectsNameApexLazyRoute: typeof ProjectsNameApexLazyRoute
+  ProjectsNameAuthLazyRoute: typeof ProjectsNameAuthLazyRoute
+  ProjectsNameClientsLazyRoute: typeof ProjectsNameClientsLazyRoute
+  ProjectsNameDeployLazyRoute: typeof ProjectsNameDeployLazyRoute
+  ProjectsNameGpackLazyRoute: typeof ProjectsNameGpackLazyRoute
+  ProjectsNameQ1LazyRoute: typeof ProjectsNameQ1LazyRoute
+  ProjectsNameQueriesLazyRoute: typeof ProjectsNameQueriesLazyRoute
+  ProjectsNameServerLazyRoute: typeof ProjectsNameServerLazyRoute
+  ProjectsNameTablesLazyRoute: typeof ProjectsNameTablesLazyRoute
+  ProjectsNameIndexLazyRoute: typeof ProjectsNameIndexLazyRoute
 }
 
 const ProjectsRouteLazyRouteChildren: ProjectsRouteLazyRouteChildren = {
-  ProjectsDirLazyRoute: ProjectsDirLazyRoute,
-  ProjectsNewLazyRoute: ProjectsNewLazyRoute,
+  ProjectsNameApexLazyRoute: ProjectsNameApexLazyRoute,
+  ProjectsNameAuthLazyRoute: ProjectsNameAuthLazyRoute,
+  ProjectsNameClientsLazyRoute: ProjectsNameClientsLazyRoute,
+  ProjectsNameDeployLazyRoute: ProjectsNameDeployLazyRoute,
+  ProjectsNameGpackLazyRoute: ProjectsNameGpackLazyRoute,
+  ProjectsNameQ1LazyRoute: ProjectsNameQ1LazyRoute,
+  ProjectsNameQueriesLazyRoute: ProjectsNameQueriesLazyRoute,
+  ProjectsNameServerLazyRoute: ProjectsNameServerLazyRoute,
+  ProjectsNameTablesLazyRoute: ProjectsNameTablesLazyRoute,
+  ProjectsNameIndexLazyRoute: ProjectsNameIndexLazyRoute,
 }
 
 const ProjectsRouteLazyRouteWithChildren =
@@ -184,9 +336,17 @@ export interface FileRoutesByFullPath {
   '/modules': typeof LayoutModulesLazyRoute
   '/packages': typeof LayoutPackagesLazyRoute
   '/settings': typeof LayoutSettingsLazyRoute
-  '/projects/$dir': typeof ProjectsDirLazyRoute
-  '/projects/new': typeof ProjectsNewLazyRoute
   '/': typeof LayoutIndexLazyRoute
+  '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
+  '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
+  '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
+  '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
+  '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
+  '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
+  '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
+  '/projects/$name/server': typeof ProjectsNameServerLazyRoute
+  '/projects/$name/tables': typeof ProjectsNameTablesLazyRoute
+  '/projects/$name': typeof ProjectsNameIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -194,9 +354,17 @@ export interface FileRoutesByTo {
   '/modules': typeof LayoutModulesLazyRoute
   '/packages': typeof LayoutPackagesLazyRoute
   '/settings': typeof LayoutSettingsLazyRoute
-  '/projects/$dir': typeof ProjectsDirLazyRoute
-  '/projects/new': typeof ProjectsNewLazyRoute
   '/': typeof LayoutIndexLazyRoute
+  '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
+  '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
+  '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
+  '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
+  '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
+  '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
+  '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
+  '/projects/$name/server': typeof ProjectsNameServerLazyRoute
+  '/projects/$name/tables': typeof ProjectsNameTablesLazyRoute
+  '/projects/$name': typeof ProjectsNameIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -206,9 +374,17 @@ export interface FileRoutesById {
   '/_layout/modules': typeof LayoutModulesLazyRoute
   '/_layout/packages': typeof LayoutPackagesLazyRoute
   '/_layout/settings': typeof LayoutSettingsLazyRoute
-  '/projects/$dir': typeof ProjectsDirLazyRoute
-  '/projects/new': typeof ProjectsNewLazyRoute
   '/_layout/': typeof LayoutIndexLazyRoute
+  '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
+  '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
+  '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
+  '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
+  '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
+  '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
+  '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
+  '/projects/$name/server': typeof ProjectsNameServerLazyRoute
+  '/projects/$name/tables': typeof ProjectsNameTablesLazyRoute
+  '/projects/$name/': typeof ProjectsNameIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -219,18 +395,34 @@ export interface FileRouteTypes {
     | '/modules'
     | '/packages'
     | '/settings'
-    | '/projects/$dir'
-    | '/projects/new'
     | '/'
+    | '/projects/$name/apex'
+    | '/projects/$name/auth'
+    | '/projects/$name/clients'
+    | '/projects/$name/deploy'
+    | '/projects/$name/gpack'
+    | '/projects/$name/q1'
+    | '/projects/$name/queries'
+    | '/projects/$name/server'
+    | '/projects/$name/tables'
+    | '/projects/$name'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/projects'
     | '/modules'
     | '/packages'
     | '/settings'
-    | '/projects/$dir'
-    | '/projects/new'
     | '/'
+    | '/projects/$name/apex'
+    | '/projects/$name/auth'
+    | '/projects/$name/clients'
+    | '/projects/$name/deploy'
+    | '/projects/$name/gpack'
+    | '/projects/$name/q1'
+    | '/projects/$name/queries'
+    | '/projects/$name/server'
+    | '/projects/$name/tables'
+    | '/projects/$name'
   id:
     | '__root__'
     | '/_layout'
@@ -238,9 +430,17 @@ export interface FileRouteTypes {
     | '/_layout/modules'
     | '/_layout/packages'
     | '/_layout/settings'
-    | '/projects/$dir'
-    | '/projects/new'
     | '/_layout/'
+    | '/projects/$name/apex'
+    | '/projects/$name/auth'
+    | '/projects/$name/clients'
+    | '/projects/$name/deploy'
+    | '/projects/$name/gpack'
+    | '/projects/$name/q1'
+    | '/projects/$name/queries'
+    | '/projects/$name/server'
+    | '/projects/$name/tables'
+    | '/projects/$name/'
   fileRoutesById: FileRoutesById
 }
 
@@ -280,8 +480,16 @@ export const routeTree = rootRoute
     "/projects": {
       "filePath": "projects/route.lazy.tsx",
       "children": [
-        "/projects/$dir",
-        "/projects/new"
+        "/projects/$name/apex",
+        "/projects/$name/auth",
+        "/projects/$name/clients",
+        "/projects/$name/deploy",
+        "/projects/$name/gpack",
+        "/projects/$name/q1",
+        "/projects/$name/queries",
+        "/projects/$name/server",
+        "/projects/$name/tables",
+        "/projects/$name/"
       ]
     },
     "/_layout/modules": {
@@ -296,17 +504,49 @@ export const routeTree = rootRoute
       "filePath": "_layout/settings.lazy.tsx",
       "parent": "/_layout"
     },
-    "/projects/$dir": {
-      "filePath": "projects/$dir.lazy.tsx",
-      "parent": "/projects"
-    },
-    "/projects/new": {
-      "filePath": "projects/new.lazy.tsx",
-      "parent": "/projects"
-    },
     "/_layout/": {
       "filePath": "_layout/index.lazy.tsx",
       "parent": "/_layout"
+    },
+    "/projects/$name/apex": {
+      "filePath": "projects/$name/apex.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/auth": {
+      "filePath": "projects/$name/auth.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/clients": {
+      "filePath": "projects/$name/clients.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/deploy": {
+      "filePath": "projects/$name/deploy.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/gpack": {
+      "filePath": "projects/$name/gpack.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/q1": {
+      "filePath": "projects/$name/q1.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/queries": {
+      "filePath": "projects/$name/queries.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/server": {
+      "filePath": "projects/$name/server.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/tables": {
+      "filePath": "projects/$name/tables.lazy.tsx",
+      "parent": "/projects"
+    },
+    "/projects/$name/": {
+      "filePath": "projects/$name/index.lazy.tsx",
+      "parent": "/projects"
     }
   }
 }

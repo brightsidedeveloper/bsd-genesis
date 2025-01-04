@@ -85,3 +85,19 @@ func getProjectsPath() string {
 
 	return filepath.Join(homeDir, "Developer", "genesis", "projects")
 }
+
+func writeProjectJSON(filePath string, data ProjectData) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ") // Pretty print JSON
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
+
+	return nil
+}
