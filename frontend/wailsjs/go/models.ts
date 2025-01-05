@@ -14,6 +14,22 @@ export namespace main {
 	        this.exists = source["exists"];
 	    }
 	}
+	export class DevServerStatus {
+	    web: boolean;
+	    mobile: boolean;
+	    desktop: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DevServerStatus(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.web = source["web"];
+	        this.mobile = source["mobile"];
+	        this.desktop = source["desktop"];
+	    }
+	}
 	export class NewProjectOptions {
 	    dir: string;
 	    name: string;

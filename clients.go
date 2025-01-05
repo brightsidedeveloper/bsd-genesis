@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+	"sync"
+	"time"
 )
 
 func (a *App) AddPlanetToProject(dir, planetType string) error {
@@ -131,4 +135,206 @@ func (a *App) OpenPlanetInVSCode(dir, planetType string) error {
 
 	fmt.Println("✅ VS Code opened successfully for", planetType, "planet in project", dir)
 	return nil
+}
+
+func (a *App) DeletePlanet(dir, planetType string) error {
+	// ✅ Validate planet type
+	validPlanets := map[string]bool{
+		"web":     true,
+		"mobile":  true,
+		"desktop": true,
+	}
+
+	if !validPlanets[planetType] {
+		return fmt.Errorf("❌ Invalid planet type: %s. Must be 'web', 'mobile', or 'desktop'", planetType)
+	}
+
+	// ✅ Construct the path to the planet directory
+	projectPath := filepath.Join(a.ProjectsDir, dir)
+	planetPath := filepath.Join(projectPath, "planets", planetType)
+
+	// ✅ Ensure the directory exists
+	if _, err := os.Stat(planetPath); os.IsNotExist(err) {
+		return fmt.Errorf("❌ Planet '%s' does not exist in project '%s'", planetType, dir)
+	}
+
+	// ✅ Remove the planet directory
+	if err := os.RemoveAll(planetPath); err != nil {
+		return fmt.Errorf("❌ Failed to delete planet: %v", err)
+	}
+
+	fmt.Println("✅ Deleted", planetType, "planet for project", dir)
+	return nil
+}
+
+func (a *App) RunBash(dir, planetType, cmd string) string {
+	// ✅ Validate planet type
+	validPlanets := map[string]bool{
+		"web":     true,
+		"mobile":  true,
+		"desktop": true,
+	}
+
+	if !validPlanets[planetType] {
+		return fmt.Sprintf("❌ Invalid planet type: %s. Must be 'web', 'mobile', or 'desktop'", planetType)
+	}
+
+	// ✅ Construct the path to the planet directory
+	projectPath := filepath.Join(a.ProjectsDir, dir)
+	planetPath := filepath.Join(projectPath, "planets", planetType)
+
+	// ✅ Ensure the directory exists
+	if _, err := os.Stat(planetPath); os.IsNotExist(err) {
+		return fmt.Sprintf("❌ Planet '%s' does not exist in project '%s'", planetType, dir)
+	}
+
+	// ✅ Run the command
+	fmt.Println("🚀 Running command in", planetType, "planet for project", dir, ":", cmd)
+	output := runCommandInDir(planetPath, "bash", "-c", cmd)
+
+	return output
+}
+
+func (a *App) StartDevServer(dir, planetType string) (string, error) {
+
+	// ✅ Validate planet type
+	validPlanets := map[string]bool{
+		"web":     true,
+		"mobile":  true,
+		"desktop": true,
+	}
+
+	if !validPlanets[planetType] {
+		return "", fmt.Errorf("❌ Invalid planet type: %s. Must be 'web', 'mobile', or 'desktop'", planetType)
+	}
+
+	// ✅ Construct the path to the planet directory
+	projectPath := filepath.Join(a.ProjectsDir, dir)
+	planetPath := filepath.Join(projectPath, "planets", planetType)
+
+	// ✅ Ensure the directory exists
+	if _, err := os.Stat(planetPath); os.IsNotExist(err) {
+		return "", fmt.Errorf("❌ Planet '%s' does not exist in project '%s'", planetType, dir)
+	}
+
+	// ✅ Ensure no previous processes are running before starting
+	fmt.Println("🛑 Stopping any existing dev servers for", planetType, "in project", dir)
+	_, err := a.StopDevServer(dir, planetType)
+	if err != nil {
+		fmt.Println("⚠️ Warning: Could not fully stop previous dev server:", err)
+	}
+
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// ✅ Start `npm run dev`
+	fmt.Println("🚀 Starting dev server for", planetType, "planet in project", dir)
+	cmd := exec.Command("npm", "run", "dev")
+	cmd.Dir = planetPath
+
+	// ✅ Capture output pipes
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return "", fmt.Errorf("❌ Failed to capture stdout: %v", err)
+	}
+
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return "", fmt.Errorf("❌ Failed to capture stderr: %v", err)
+	}
+
+	// ✅ Start process in background
+	if err := cmd.Start(); err != nil {
+		return "", fmt.Errorf("❌ Failed to start dev server: %v", err)
+	}
+
+	// ✅ Use a WaitGroup to block for a short period before returning
+	var wg sync.WaitGroup
+	wg.Add(2) // ✅ Wait for both stdout and stderr
+
+	output := ""
+
+	go func() {
+		defer wg.Done()
+		scanner := bufio.NewScanner(stdoutPipe)
+		for scanner.Scan() {
+			line := scanner.Text()
+			output += line + "\n"
+			fmt.Println(line) // ✅ Stream to UI
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		scanner := bufio.NewScanner(stderrPipe)
+		for scanner.Scan() {
+			line := scanner.Text()
+			output += line + "\n"
+			fmt.Println(line) // ✅ Stream to UI
+		}
+	}()
+
+	// ✅ Wait for a brief period before returning
+	waitTime := 2 * time.Second
+	fmt.Println("⏳ Waiting", waitTime, "for logs before returning...")
+	time.Sleep(waitTime)
+
+	return output, nil
+}
+
+func (a *App) StopDevServer(dir, planetType string) (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	fmt.Println("🔍 Searching for running dev servers for:", planetType, "in project", dir)
+
+	projectPath := filepath.Join(a.ProjectsDir, dir, "planets", planetType)
+
+	// 🔍 Find all running processes related to this project
+	cmd := exec.Command("ps", "aux")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("❌ Failed to fetch process list: %v", err)
+	}
+
+	lines := strings.Split(string(output), "\n")
+	processKilled := false
+
+	for _, line := range lines {
+		// Check if the process is running in the planet directory
+		if strings.Contains(line, projectPath) {
+			fields := strings.Fields(line)
+			if len(fields) > 1 {
+				pid := fields[1] // Extract PID
+				fmt.Println("🔪 Killing process:", pid)
+				exec.Command("kill", "-9", pid).Run() // Force kill
+				processKilled = true
+			}
+		}
+	}
+
+	// ✅ If no process was killed, return a warning
+	if !processKilled {
+		fmt.Println("⚠️ No running dev servers found for:", planetType, "in project", dir)
+		return "", nil
+	}
+
+	fmt.Println("✅ All dev server processes stopped for:", planetType, "in project", dir)
+	return fmt.Sprintf("✅ Dev server stopped for '%s' in project '%s'", planetType, dir), nil
+}
+
+type DevServerStatus struct {
+	Web     bool `json:"web"`
+	Mobile  bool `json:"mobile"`
+	Desktop bool `json:"desktop"`
+}
+
+func (a *App) GetDevServersStatus(dir string) DevServerStatus {
+	projectPath := filepath.Join(a.ProjectsDir, dir, "planets")
+
+	return DevServerStatus{
+		Web:     isDevServerRunning(filepath.Join(projectPath, "web")),
+		Mobile:  isDevServerRunning(filepath.Join(projectPath, "mobile")),
+		Desktop: isDevServerRunning(filepath.Join(projectPath, "desktop")),
+	}
 }

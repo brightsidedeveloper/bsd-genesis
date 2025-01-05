@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 )
 
 func ensureDir(dir string) error {
@@ -120,19 +119,43 @@ func checkIfProjectExists(projectPath string) error {
 	return nil
 }
 
+func fixPermissions(dest string) error {
+	err := filepath.Walk(dest, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// ✅ Ensure executable permissions for binaries in `node_modules/.bin/`
+		if info.Mode().IsRegular() && filepath.Ext(path) == "" {
+			if err := os.Chmod(path, 0755); err != nil {
+				return fmt.Errorf("❌ Failed to set executable permission for: %s", path)
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("❌ Error fixing permissions: %v", err)
+	}
+
+	fmt.Println("✅ File permissions fixed in:", dest)
+	return nil
+}
+
 func copyTemplate(srcDir, destDir string) error {
 	if err := ensureDir(destDir); err != nil {
 		return err
 	}
 
-	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		// ✅ Skip the `.git` directory and its contents
-		if info.IsDir() && strings.HasSuffix(path, ".git") {
-			fmt.Println("🚫 Skipping .git directory:", path)
+		// ✅ Skip `.git` and `node_modules/`
+		base := filepath.Base(path)
+		if info.IsDir() && (base == ".git" || base == "node_modules") {
+			fmt.Println("🚫 Skipping directory:", path)
 			return filepath.SkipDir
 		}
 
@@ -147,6 +170,13 @@ func copyTemplate(srcDir, destDir string) error {
 		}
 		return copyFile(path, destPath)
 	})
+
+	if err != nil {
+		return fmt.Errorf("❌ Error copying template: %v", err)
+	}
+
+	fmt.Println("✅ Template copied successfully!")
+	return nil
 }
 
 func copyFile(src, dest string) error {

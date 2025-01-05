@@ -1,14 +1,19 @@
 import {
   AddPlanetToProject,
   CreateProject,
+  DeletePlanet,
   DeleteProject,
   GetActivePlanets,
+  GetDevServersStatus,
   GetPort,
   GetProjects,
   GetServerStatus,
   OpenPlanetInVSCode,
   RestartServer,
+  RunBash,
+  StartDevServer,
   StartServer,
+  StopDevServer,
   StopServer,
   UpdatePort,
 } from '../wailsjs/go/main/App'
@@ -30,6 +35,11 @@ export default class Go {
   static clients = {
     get: GetActivePlanets,
     create: AddPlanetToProject,
+    delete: DeletePlanet,
     open: OpenPlanetInVSCode,
+    bash: RunBash,
+    startDev: StartDevServer,
+    stopDev: StopDevServer,
+    devServers: GetDevServersStatus,
   }
 }

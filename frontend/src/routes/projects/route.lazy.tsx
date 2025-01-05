@@ -39,19 +39,22 @@ function RouteComponent() {
   const { name, dir } = useDirAndName()
 
   function deleteProject() {
-    Go.server
-      .stop(dir)
-      .then(() => {
-        toast('Server Stopped', { description: 'Server stopped for ' + name })
-        Go.projects
-          .delete(dir)
-          .then(() => {
-            navigate({ to: '/' })
-            toast(name + ' deleted', { description: '/Genesis/projects/' + dir })
-          })
-          .catch(() => toast('Error', { description: 'Failed to delete project' }))
-      })
-      .catch(() => toast('Error', { description: 'Failed to stop server' }))
+    Promise.all([Go.clients.stopDev(dir, 'web'), Go.clients.stopDev(dir, 'mobile'), Go.clients.stopDev(dir, 'desktop')]).then(() => {
+      toast('Clients Stopped', { description: 'Clients stopped for ' + name })
+      Go.server
+        .stop(dir)
+        .then(() => {
+          toast('Server Stopped', { description: 'Server stopped for ' + name })
+          Go.projects
+            .delete(dir)
+            .then(() => {
+              navigate({ to: '/' })
+              toast(name + ' deleted', { description: '/Genesis/projects/' + dir })
+            })
+            .catch(() => toast('Error', { description: 'Failed to delete project' }))
+        })
+        .catch(() => toast('Error', { description: 'Failed to stop server' }))
+    })
   }
 
   return (

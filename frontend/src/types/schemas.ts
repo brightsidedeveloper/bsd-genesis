@@ -43,3 +43,11 @@ export const GetClientAppsSchema = z.array(
 )
 
 export type GetClientAppsType = z.infer<typeof GetClientAppsSchema>
+
+export const GetClientDevServersSchema = z.object({
+  web: z.boolean(),
+  mobile: z.boolean(),
+  desktop: z.boolean(),
+})
+
+export type GetClientDevServersType = z.infer<typeof GetClientDevServersSchema>

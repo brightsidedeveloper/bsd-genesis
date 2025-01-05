@@ -10,12 +10,20 @@ export function CreateProject(arg1) {
   return window['go']['main']['App']['CreateProject'](arg1);
 }
 
+export function DeletePlanet(arg1, arg2) {
+  return window['go']['main']['App']['DeletePlanet'](arg1, arg2);
+}
+
 export function DeleteProject(arg1) {
   return window['go']['main']['App']['DeleteProject'](arg1);
 }
 
 export function GetActivePlanets(arg1) {
   return window['go']['main']['App']['GetActivePlanets'](arg1);
+}
+
+export function GetDevServersStatus(arg1) {
+  return window['go']['main']['App']['GetDevServersStatus'](arg1);
 }
 
 export function GetPort(arg1) {
@@ -38,8 +46,20 @@ export function RestartServer(arg1) {
   return window['go']['main']['App']['RestartServer'](arg1);
 }
 
+export function RunBash(arg1, arg2, arg3) {
+  return window['go']['main']['App']['RunBash'](arg1, arg2, arg3);
+}
+
+export function StartDevServer(arg1, arg2) {
+  return window['go']['main']['App']['StartDevServer'](arg1, arg2);
+}
+
 export function StartServer(arg1) {
   return window['go']['main']['App']['StartServer'](arg1);
+}
+
+export function StopDevServer(arg1, arg2) {
+  return window['go']['main']['App']['StopDevServer'](arg1, arg2);
 }
 
 export function StopServer(arg1) {
