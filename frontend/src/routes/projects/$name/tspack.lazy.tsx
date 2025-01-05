@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 
-export const Route = createLazyFileRoute('/projects/$name/gpack')({
+export const Route = createLazyFileRoute('/projects/$name/tspack')({
   component: RouteComponent,
 })
 

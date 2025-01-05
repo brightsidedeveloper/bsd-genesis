@@ -23,6 +23,7 @@ const LayoutPackagesLazyImport = createFileRoute('/_layout/packages')()
 const LayoutModulesLazyImport = createFileRoute('/_layout/modules')()
 const ProjectsNameRouteLazyImport = createFileRoute('/projects/$name')()
 const ProjectsNameIndexLazyImport = createFileRoute('/projects/$name/')()
+const ProjectsNameTspackLazyImport = createFileRoute('/projects/$name/tspack')()
 const ProjectsNameTablesLazyImport = createFileRoute('/projects/$name/tables')()
 const ProjectsNameServerLazyImport = createFileRoute('/projects/$name/server')()
 const ProjectsNameSchemasLazyImport = createFileRoute(
@@ -32,7 +33,6 @@ const ProjectsNameQueriesLazyImport = createFileRoute(
   '/projects/$name/queries',
 )()
 const ProjectsNameQ1LazyImport = createFileRoute('/projects/$name/q1')()
-const ProjectsNameGpackLazyImport = createFileRoute('/projects/$name/gpack')()
 const ProjectsNameGomodLazyImport = createFileRoute('/projects/$name/gomod')()
 const ProjectsNameGitLazyImport = createFileRoute('/projects/$name/git')()
 const ProjectsNameEndpointsLazyImport = createFileRoute(
@@ -98,6 +98,14 @@ const ProjectsNameIndexLazyRoute = ProjectsNameIndexLazyImport.update({
   import('./routes/projects/$name/index.lazy').then((d) => d.Route),
 )
 
+const ProjectsNameTspackLazyRoute = ProjectsNameTspackLazyImport.update({
+  id: '/tspack',
+  path: '/tspack',
+  getParentRoute: () => ProjectsNameRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/tspack.lazy').then((d) => d.Route),
+)
+
 const ProjectsNameTablesLazyRoute = ProjectsNameTablesLazyImport.update({
   id: '/tables',
   path: '/tables',
@@ -136,14 +144,6 @@ const ProjectsNameQ1LazyRoute = ProjectsNameQ1LazyImport.update({
   getParentRoute: () => ProjectsNameRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/projects/$name/q1.lazy').then((d) => d.Route),
-)
-
-const ProjectsNameGpackLazyRoute = ProjectsNameGpackLazyImport.update({
-  id: '/gpack',
-  path: '/gpack',
-  getParentRoute: () => ProjectsNameRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/projects/$name/gpack.lazy').then((d) => d.Route),
 )
 
 const ProjectsNameGomodLazyRoute = ProjectsNameGomodLazyImport.update({
@@ -297,13 +297,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsNameGomodLazyImport
       parentRoute: typeof ProjectsNameRouteLazyImport
     }
-    '/projects/$name/gpack': {
-      id: '/projects/$name/gpack'
-      path: '/gpack'
-      fullPath: '/projects/$name/gpack'
-      preLoaderRoute: typeof ProjectsNameGpackLazyImport
-      parentRoute: typeof ProjectsNameRouteLazyImport
-    }
     '/projects/$name/q1': {
       id: '/projects/$name/q1'
       path: '/q1'
@@ -337,6 +330,13 @@ declare module '@tanstack/react-router' {
       path: '/tables'
       fullPath: '/projects/$name/tables'
       preLoaderRoute: typeof ProjectsNameTablesLazyImport
+      parentRoute: typeof ProjectsNameRouteLazyImport
+    }
+    '/projects/$name/tspack': {
+      id: '/projects/$name/tspack'
+      path: '/tspack'
+      fullPath: '/projects/$name/tspack'
+      preLoaderRoute: typeof ProjectsNameTspackLazyImport
       parentRoute: typeof ProjectsNameRouteLazyImport
     }
     '/projects/$name/': {
@@ -377,12 +377,12 @@ interface ProjectsNameRouteLazyRouteChildren {
   ProjectsNameEndpointsLazyRoute: typeof ProjectsNameEndpointsLazyRoute
   ProjectsNameGitLazyRoute: typeof ProjectsNameGitLazyRoute
   ProjectsNameGomodLazyRoute: typeof ProjectsNameGomodLazyRoute
-  ProjectsNameGpackLazyRoute: typeof ProjectsNameGpackLazyRoute
   ProjectsNameQ1LazyRoute: typeof ProjectsNameQ1LazyRoute
   ProjectsNameQueriesLazyRoute: typeof ProjectsNameQueriesLazyRoute
   ProjectsNameSchemasLazyRoute: typeof ProjectsNameSchemasLazyRoute
   ProjectsNameServerLazyRoute: typeof ProjectsNameServerLazyRoute
   ProjectsNameTablesLazyRoute: typeof ProjectsNameTablesLazyRoute
+  ProjectsNameTspackLazyRoute: typeof ProjectsNameTspackLazyRoute
   ProjectsNameIndexLazyRoute: typeof ProjectsNameIndexLazyRoute
 }
 
@@ -394,12 +394,12 @@ const ProjectsNameRouteLazyRouteChildren: ProjectsNameRouteLazyRouteChildren = {
   ProjectsNameEndpointsLazyRoute: ProjectsNameEndpointsLazyRoute,
   ProjectsNameGitLazyRoute: ProjectsNameGitLazyRoute,
   ProjectsNameGomodLazyRoute: ProjectsNameGomodLazyRoute,
-  ProjectsNameGpackLazyRoute: ProjectsNameGpackLazyRoute,
   ProjectsNameQ1LazyRoute: ProjectsNameQ1LazyRoute,
   ProjectsNameQueriesLazyRoute: ProjectsNameQueriesLazyRoute,
   ProjectsNameSchemasLazyRoute: ProjectsNameSchemasLazyRoute,
   ProjectsNameServerLazyRoute: ProjectsNameServerLazyRoute,
   ProjectsNameTablesLazyRoute: ProjectsNameTablesLazyRoute,
+  ProjectsNameTspackLazyRoute: ProjectsNameTspackLazyRoute,
   ProjectsNameIndexLazyRoute: ProjectsNameIndexLazyRoute,
 }
 
@@ -422,12 +422,12 @@ export interface FileRoutesByFullPath {
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
   '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/gomod': typeof ProjectsNameGomodLazyRoute
-  '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
   '/projects/$name/schemas': typeof ProjectsNameSchemasLazyRoute
   '/projects/$name/server': typeof ProjectsNameServerLazyRoute
   '/projects/$name/tables': typeof ProjectsNameTablesLazyRoute
+  '/projects/$name/tspack': typeof ProjectsNameTspackLazyRoute
   '/projects/$name/': typeof ProjectsNameIndexLazyRoute
 }
 
@@ -443,12 +443,12 @@ export interface FileRoutesByTo {
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
   '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/gomod': typeof ProjectsNameGomodLazyRoute
-  '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
   '/projects/$name/schemas': typeof ProjectsNameSchemasLazyRoute
   '/projects/$name/server': typeof ProjectsNameServerLazyRoute
   '/projects/$name/tables': typeof ProjectsNameTablesLazyRoute
+  '/projects/$name/tspack': typeof ProjectsNameTspackLazyRoute
   '/projects/$name': typeof ProjectsNameIndexLazyRoute
 }
 
@@ -467,12 +467,12 @@ export interface FileRoutesById {
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
   '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/gomod': typeof ProjectsNameGomodLazyRoute
-  '/projects/$name/gpack': typeof ProjectsNameGpackLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
   '/projects/$name/schemas': typeof ProjectsNameSchemasLazyRoute
   '/projects/$name/server': typeof ProjectsNameServerLazyRoute
   '/projects/$name/tables': typeof ProjectsNameTablesLazyRoute
+  '/projects/$name/tspack': typeof ProjectsNameTspackLazyRoute
   '/projects/$name/': typeof ProjectsNameIndexLazyRoute
 }
 
@@ -492,12 +492,12 @@ export interface FileRouteTypes {
     | '/projects/$name/endpoints'
     | '/projects/$name/git'
     | '/projects/$name/gomod'
-    | '/projects/$name/gpack'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
     | '/projects/$name/schemas'
     | '/projects/$name/server'
     | '/projects/$name/tables'
+    | '/projects/$name/tspack'
     | '/projects/$name/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -512,12 +512,12 @@ export interface FileRouteTypes {
     | '/projects/$name/endpoints'
     | '/projects/$name/git'
     | '/projects/$name/gomod'
-    | '/projects/$name/gpack'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
     | '/projects/$name/schemas'
     | '/projects/$name/server'
     | '/projects/$name/tables'
+    | '/projects/$name/tspack'
     | '/projects/$name'
   id:
     | '__root__'
@@ -534,12 +534,12 @@ export interface FileRouteTypes {
     | '/projects/$name/endpoints'
     | '/projects/$name/git'
     | '/projects/$name/gomod'
-    | '/projects/$name/gpack'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
     | '/projects/$name/schemas'
     | '/projects/$name/server'
     | '/projects/$name/tables'
+    | '/projects/$name/tspack'
     | '/projects/$name/'
   fileRoutesById: FileRoutesById
 }
@@ -587,12 +587,12 @@ export const routeTree = rootRoute
         "/projects/$name/endpoints",
         "/projects/$name/git",
         "/projects/$name/gomod",
-        "/projects/$name/gpack",
         "/projects/$name/q1",
         "/projects/$name/queries",
         "/projects/$name/schemas",
         "/projects/$name/server",
         "/projects/$name/tables",
+        "/projects/$name/tspack",
         "/projects/$name/"
       ]
     },
@@ -640,10 +640,6 @@ export const routeTree = rootRoute
       "filePath": "projects/$name/gomod.lazy.tsx",
       "parent": "/projects/$name"
     },
-    "/projects/$name/gpack": {
-      "filePath": "projects/$name/gpack.lazy.tsx",
-      "parent": "/projects/$name"
-    },
     "/projects/$name/q1": {
       "filePath": "projects/$name/q1.lazy.tsx",
       "parent": "/projects/$name"
@@ -662,6 +658,10 @@ export const routeTree = rootRoute
     },
     "/projects/$name/tables": {
       "filePath": "projects/$name/tables.lazy.tsx",
+      "parent": "/projects/$name"
+    },
+    "/projects/$name/tspack": {
+      "filePath": "projects/$name/tspack.lazy.tsx",
       "parent": "/projects/$name"
     },
     "/projects/$name/": {

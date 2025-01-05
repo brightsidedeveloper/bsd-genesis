@@ -152,18 +152,7 @@ const routes = [
   { to: '/projects/$name/schemas', label: 'Schemas', Icon: Braces },
   { to: '/projects/$name/q1', label: 'Q1 Storage', Icon: Database },
   { to: '/projects/$name/gomod', label: 'Go Mod', Icon: Library },
-  { to: '/projects/$name/gpack', label: 'G Pack', Icon: Package },
+  { to: '/projects/$name/tspack', label: 'TS Pack', Icon: Package },
   { to: '/projects/$name/git', label: 'Git', Icon: GitGraph },
   { to: '/projects/$name/deploy', label: 'Deploy', Icon: Ship },
 ] as const
-
-// Next Steps:
-
-// 4. Setup Client Spawner in App
-// 5. Setup APEX
-// 6. Setup Authentication
-// 7. Setup Tables
-// 8. Setup Queries
-// 9. Setup Q1 Storage
-// 10. Setup G-Pack
-// 11. Setup Deploy
