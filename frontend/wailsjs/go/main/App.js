@@ -22,6 +22,10 @@ export function GetActivePlanets(arg1) {
   return window['go']['main']['App']['GetActivePlanets'](arg1);
 }
 
+export function GetApex(arg1) {
+  return window['go']['main']['App']['GetApex'](arg1);
+}
+
 export function GetDevServersStatus(arg1) {
   return window['go']['main']['App']['GetDevServersStatus'](arg1);
 }

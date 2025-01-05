@@ -12,6 +12,8 @@ export function DeleteProject(arg1:string):Promise<void>;
 
 export function GetActivePlanets(arg1:string):Promise<Array<main.ClientApp>>;
 
+export function GetApex(arg1:string):Promise<main.ApexData>;
+
 export function GetDevServersStatus(arg1:string):Promise<main.DevServerStatus>;
 
 export function GetPort(arg1:string):Promise<string>;

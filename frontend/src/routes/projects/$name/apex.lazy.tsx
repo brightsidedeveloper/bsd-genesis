@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useApexStore } from '@/hooks/useApexStore'
 import { cn } from '@/lib/utils'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
@@ -10,6 +11,8 @@ export const Route = createLazyFileRoute('/projects/$name/apex')({
 })
 
 function RouteComponent() {
+  const { apex } = useApexStore()
+
   const [operation, setOperation] = useState('')
 
   const data = useMemo(() => some[operation] ?? false, [operation])
@@ -32,6 +35,7 @@ function RouteComponent() {
               <h3 className="text-lg font-semibold">Select or create an operation</h3>
             </div>
           )}
+          {JSON.stringify(apex)}
         </ScrollArea>
         <ScrollArea className="w-52 h-[calc(100vh-var(--header-height)-40px-64px)] border-l px-4 flex flex-col gap-2">
           <div className="flex items-center justify-between mb-2">

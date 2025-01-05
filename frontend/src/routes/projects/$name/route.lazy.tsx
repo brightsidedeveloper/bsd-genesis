@@ -1,4 +1,9 @@
-import { createLazyFileRoute, Link, Outlet, useNavigate } from '@tanstack/react-router'
+import {
+  createLazyFileRoute,
+  Link,
+  Outlet,
+  useNavigate,
+} from '@tanstack/react-router'
 import logo from '@/assets/images/logo.png'
 import {
   Aperture,
@@ -32,8 +37,10 @@ import { Button } from '@/components/ui/button'
 import Go from '@/Go'
 import useDirAndName from '@/hooks/useDirAndName'
 import { toast } from 'sonner'
+import { useApexStore } from '@/hooks/useApexStore'
+import { useEffect } from 'react'
 
-export const Route = createLazyFileRoute('/projects')({
+export const Route = createLazyFileRoute('/projects/$name')({
   component: RouteComponent,
 })
 
@@ -41,8 +48,18 @@ function RouteComponent() {
   const navigate = useNavigate()
   const { name, dir } = useDirAndName()
 
+  const { reset, loadApex } = useApexStore()
+  useEffect(() => {
+    reset()
+    loadApex(dir)
+  }, [reset, loadApex, dir])
+
   function deleteProject() {
-    Promise.all([Go.clients.stopDev(dir, 'web'), Go.clients.stopDev(dir, 'mobile'), Go.clients.stopDev(dir, 'desktop')]).then(() => {
+    Promise.all([
+      Go.clients.stopDev(dir, 'web'),
+      Go.clients.stopDev(dir, 'mobile'),
+      Go.clients.stopDev(dir, 'desktop'),
+    ]).then(() => {
       toast('Clients Stopped', { description: 'Clients stopped for ' + name })
       Go.server
         .stop(dir)
@@ -52,9 +69,13 @@ function RouteComponent() {
             .delete(dir)
             .then(() => {
               navigate({ to: '/' })
-              toast(name + ' deleted', { description: '/Genesis/projects/' + dir })
+              toast(name + ' deleted', {
+                description: '/Genesis/projects/' + dir,
+              })
             })
-            .catch(() => toast('Error', { description: 'Failed to delete project' }))
+            .catch(() =>
+              toast('Error', { description: 'Failed to delete project' }),
+            )
         })
         .catch(() => toast('Error', { description: 'Failed to stop server' }))
     })
@@ -105,7 +126,9 @@ function RouteComponent() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Delete Project</DialogTitle>
-                <DialogDescription>Are you sure you want to delete this project?</DialogDescription>
+                <DialogDescription>
+                  Are you sure you want to delete this project?
+                </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <div className="flex items-center gap-4 justify-between">

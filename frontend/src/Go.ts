@@ -4,6 +4,7 @@ import {
   DeletePlanet,
   DeleteProject,
   GetActivePlanets,
+  GetApex,
   GetDevServersStatus,
   GetPort,
   GetProjects,
@@ -41,5 +42,8 @@ export default class Go {
     startDev: StartDevServer,
     stopDev: StopDevServer,
     devServers: GetDevServersStatus,
+  }
+  static apex = {
+    get: GetApex,
   }
 }

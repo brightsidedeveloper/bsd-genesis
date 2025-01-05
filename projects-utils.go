@@ -87,7 +87,7 @@ func getProjectsPath() string {
 	return filepath.Join(homeDir, "Developer", "genesis", "projects")
 }
 
-func writeProjectJSON(filePath string, data ProjectData) error {
+func writeJSON(filePath string, data interface{}) error {
 	file, err := os.Create(filePath)
 	if err != nil {
 		return err

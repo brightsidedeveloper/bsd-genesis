@@ -70,8 +70,19 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 		Description: o.Description,
 	}
 
-	if err := writeProjectJSON(projectFilePath, projectData); err != nil {
+	if err := writeJSON(projectFilePath, projectData); err != nil {
 		return fmt.Errorf("❌ Failed to write project.json: %v", err)
+	}
+
+	apexFilePath := filepath.Join(projectPath, "apex.json")
+	apexData := ApexData{
+		Endpoints:  []Endpoint{},
+		Schemas:    []Schema{},
+		Operations: []Operation{},
+	}
+
+	if err := writeJSON(apexFilePath, apexData); err != nil {
+		return fmt.Errorf("❌ Failed to write apex.json: %v", err)
 	}
 
 	fmt.Println("✅ Project successfully created at:", projectPath)
