@@ -1,3 +1,4 @@
+import useDirAndName from '@/hooks/useDirAndName'
 import { createLazyFileRoute } from '@tanstack/react-router'
 
 export const Route = createLazyFileRoute('/projects/$name/')({
@@ -5,5 +6,6 @@ export const Route = createLazyFileRoute('/projects/$name/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/projects/$name/"!</div>
+  const { name } = useDirAndName()
+  return <div>Hello {name}</div>
 }

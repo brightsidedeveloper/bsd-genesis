@@ -4,6 +4,7 @@ import {
   Aperture,
   AppWindowMac,
   ArrowLeft,
+  Braces,
   Database,
   GitGraph,
   Package,
@@ -59,7 +60,7 @@ function RouteComponent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="bg-card border-b pl-52 py-2">
+      <header className="bg-card border-b pl-52 py-2 h-[--header-height]">
         <h1 className="text-3xl px-4 font-bold">{name}</h1>
       </header>
       <aside className="bg-card min-h-screen overflow-y-auto w-52 fixed top-0 left-0 px-4 pb-4 flex flex-col gap-3 border-r">
@@ -132,6 +133,7 @@ const routes = [
   { to: '/projects/$name/server', label: 'Server', Icon: PcCase },
   { to: '/projects/$name/clients', label: 'Clients', Icon: AppWindowMac },
   { to: '/projects/$name/apex', label: 'APEX', Icon: Aperture },
+  { to: '/projects/$name/schemas', label: 'Schemas', Icon: Braces },
   { to: '/projects/$name/auth', label: 'Authentication', Icon: Users },
   { to: '/projects/$name/tables', label: 'Tables', Icon: Table },
   { to: '/projects/$name/queries', label: 'Queries', Icon: Replace },
