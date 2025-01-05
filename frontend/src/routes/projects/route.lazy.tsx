@@ -7,6 +7,7 @@ import {
   Braces,
   Database,
   GitGraph,
+  Library,
   Package,
   PcCase,
   Replace,
@@ -140,7 +141,8 @@ const routes = [
   { to: '/projects/$name/queries', label: 'Queries', Icon: Replace },
   { to: '/projects/$name/schemas', label: 'Schemas', Icon: Braces },
   { to: '/projects/$name/q1', label: 'Q1 Storage', Icon: Database },
-  { to: '/projects/$name/gpack', label: 'G-Pack', Icon: Package },
+  { to: '/projects/$name/gomod', label: 'Go Mod', Icon: Library },
+  { to: '/projects/$name/gpack', label: 'G Pack', Icon: Package },
   { to: '/projects/$name/git', label: 'Git', Icon: GitGraph },
   { to: '/projects/$name/deploy', label: 'Deploy', Icon: Ship },
 ] as const

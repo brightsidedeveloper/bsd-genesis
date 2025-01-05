@@ -24,7 +24,9 @@ function RouteComponent() {
       <div className="flex relative">
         <ScrollArea className="flex-1 h-[calc(100vh-var(--header-height)-40px-64px)]">
           {operation ? (
-            <div className="flex flex-col gap-4 p-4">{JSON.stringify(data)}</div>
+            <div className="flex flex-col gap-4 p-4">
+              {operation}: {JSON.stringify(data)}
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
               <h3 className="text-lg font-semibold">Select or create an operation</h3>
