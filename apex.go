@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 	"path/filepath"
 )
 
@@ -16,12 +18,13 @@ type ApexData struct {
 type Endpoint struct {
 	Path    string   `json:"path"`
 	Methods []string `json:"methods"`
-	Secure  bool     `json:"secure"`
+	Secured []string `json:"secured"`
 }
 
 // Schema represents an object with fields, supporting nested objects and arrays
 type Schema struct {
 	Name   string          `json:"name"`
+	Type   string          `json:"type"`
 	Fields json.RawMessage `json:"fields"` // Raw JSON to support nested structures
 }
 
@@ -42,4 +45,23 @@ func (a *App) GetApex(dir string) (*ApexData, error) {
 	}
 
 	return data, nil
+}
+
+func (a *App) SaveApex(dir string, apexData ApexData) error {
+	// Define the file path
+	apexFilePath := filepath.Join(a.ProjectsDir, dir, "apex.json")
+
+	// Marshal ApexData into formatted JSON
+	jsonData, err := json.MarshalIndent(apexData, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal apex.json: %w", err)
+	}
+
+	// Write JSON to the file
+	if err := os.WriteFile(apexFilePath, jsonData, 0644); err != nil {
+		return fmt.Errorf("failed to write apex.json: %w", err)
+	}
+
+	fmt.Println("✅ Successfully saved apex.json at:", apexFilePath)
+	return nil
 }

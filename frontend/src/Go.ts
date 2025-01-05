@@ -12,6 +12,7 @@ import {
   OpenPlanetInVSCode,
   RestartServer,
   RunBash,
+  SaveApex,
   StartDevServer,
   StartServer,
   StopDevServer,
@@ -45,5 +46,6 @@ export default class Go {
   }
   static apex = {
     get: GetApex,
+    save: SaveApex,
   }
 }

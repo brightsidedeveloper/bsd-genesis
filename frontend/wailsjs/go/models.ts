@@ -22,6 +22,7 @@ export namespace main {
 	}
 	export class Schema {
 	    name: string;
+	    type: string;
 	    fields: number[];
 	
 	    static createFrom(source: any = {}) {
@@ -31,13 +32,14 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
+	        this.type = source["type"];
 	        this.fields = source["fields"];
 	    }
 	}
 	export class Endpoint {
 	    path: string;
 	    methods: string[];
-	    secure: boolean;
+	    secured: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Endpoint(source);
@@ -47,7 +49,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.path = source["path"];
 	        this.methods = source["methods"];
-	        this.secure = source["secure"];
+	        this.secured = source["secured"];
 	    }
 	}
 	export class ApexData {

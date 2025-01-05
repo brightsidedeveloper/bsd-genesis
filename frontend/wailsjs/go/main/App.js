@@ -54,6 +54,10 @@ export function RunBash(arg1, arg2, arg3) {
   return window['go']['main']['App']['RunBash'](arg1, arg2, arg3);
 }
 
+export function SaveApex(arg1, arg2) {
+  return window['go']['main']['App']['SaveApex'](arg1, arg2);
+}
+
 export function StartDevServer(arg1, arg2) {
   return window['go']['main']['App']['StartDevServer'](arg1, arg2);
 }

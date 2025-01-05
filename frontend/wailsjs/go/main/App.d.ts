@@ -28,6 +28,8 @@ export function RestartServer(arg1:string):Promise<void>;
 
 export function RunBash(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function SaveApex(arg1:string,arg2:main.ApexData):Promise<void>;
+
 export function StartDevServer(arg1:string,arg2:string):Promise<string>;
 
 export function StartServer(arg1:string):Promise<void>;
