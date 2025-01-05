@@ -11,7 +11,7 @@ export const Route = createLazyFileRoute('/projects/$name/apex')({
 })
 
 function RouteComponent() {
-  const { apex } = useApexStore()
+  const { apex, isDirty } = useApexStore()
 
   const [operation, setOperation] = useState('')
 
@@ -35,7 +35,8 @@ function RouteComponent() {
               <h3 className="text-lg font-semibold">Select or create an operation</h3>
             </div>
           )}
-          {JSON.stringify(apex)}
+          <pre>{JSON.stringify(apex)}</pre>
+          {isDirty ? <div>Dirty</div> : <div>Clean</div>}
         </ScrollArea>
         <ScrollArea className="w-52 h-[calc(100vh-var(--header-height)-40px-64px)] border-l px-4 flex flex-col gap-2">
           <div className="flex items-center justify-between mb-2">

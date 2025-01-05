@@ -1,4 +1,5 @@
 import Go from '@/Go'
+import isEqual from 'lodash.isequal'
 import { z } from 'zod'
 import { create } from 'zustand'
 
@@ -72,8 +73,11 @@ export type ApexData = z.infer<typeof ApexSchema>
 // Zustand Store
 interface ApexStore {
   apex: ApexData
+  originalApex: ApexData
+  isDirty: boolean
   reset: () => void
-  loadApex: (projectDir: string) => Promise<void>
+  clear: () => void
+  loadApex: (dir: string) => Promise<void>
   addEndpoint: (endpoint: Endpoint) => void
   updateEndpoint: (index: number, updated: Endpoint) => void
   deleteEndpoint: (index: number) => void
@@ -83,19 +87,26 @@ interface ApexStore {
   addOperation: (operation: Operation) => void
   updateOperation: (index: number, updated: Operation) => void
   deleteOperation: (index: number) => void
-  saveApex: (projectDir: string) => Promise<void>
+  saveApex: (dir: string) => Promise<void>
 }
 
-export const useApexStore = create<ApexStore>()((set) => ({
+export const useApexStore = create<ApexStore>()((set, get) => ({
   apex: { endpoints: [], schemas: [], operations: [] },
+  originalApex: { endpoints: [], schemas: [], operations: [] },
 
-  reset: () => set({ apex: { endpoints: [], schemas: [], operations: [] } }),
+  // Check if APEX data is dirty (changed)
+  get isDirty() {
+    return !isEqual(get().apex, get().originalApex)
+  },
+
+  reset: () => set({ apex: get().originalApex }),
+  clear: () => set({ apex: { endpoints: [], schemas: [], operations: [] } }),
   // Load apex.json from backend
-  loadApex: async (projectDir) => {
+  loadApex: async (dir) => {
     try {
-      const rawApex = await Go.apex.get(projectDir)
+      const rawApex = await Go.apex.get(dir)
       const apex = ApexSchema.parse(rawApex)
-      set({ apex })
+      set({ apex, originalApex: apex })
     } catch (error) {
       console.error('❌ Error loading APEX data:', error)
     }
@@ -147,8 +158,8 @@ export const useApexStore = create<ApexStore>()((set) => ({
     }),
 
   // Save changes to apex.json
-  saveApex: async (projectDir) => {
+  saveApex: async (dir) => {
     // TODO
-    console.log('Saving APEX data...', projectDir)
+    console.log('Saving APEX data...', dir)
   },
 }))
