@@ -78,6 +78,7 @@ function RouteComponent() {
       <div className="grid grid-cols-2 gap-4">
         {apps?.map((app, i) => {
           const serverRunning = devRunning[app.type]
+          const capitalized = app.type.slice(0, 1).toUpperCase() + app.type.slice(1)
           return (
             <Card key={i} className="flex flex-col justify-between">
               <CardHeader>
@@ -112,10 +113,10 @@ function RouteComponent() {
                                     .then(() => {
                                       closeRef.current?.click()
                                       refetchClients()
-                                      toast(app.type.slice(0, 1).toUpperCase() + app.type.slice(1) + ' deleted.')
+                                      toast(capitalized + ' deleted.')
                                     })
                                     .catch(() => {
-                                      toast('Failed to delete project', { description: 'That stinks, my bad' })
+                                      toast(`Failed to delete ${capitalized} project`, { description: 'That stinks, my bad' })
                                     })
                                     .finally(() => setBashing(false))
                                 }
@@ -123,11 +124,15 @@ function RouteComponent() {
                                   Go.clients
                                     .stopDev(dir, app.type)
                                     .then(() => {
-                                      toast('Dev server stopped')
+                                      toast(capitalized + ' stopped', {
+                                        description: 'Successfully stopped',
+                                      })
                                       next()
                                     })
                                     .catch(() => {
-                                      toast('Failed to stop dev server', { description: 'That stinks, my bad' })
+                                      toast(`Failed to stop ${capitalized} server`, {
+                                        description: 'That stinks, my bad',
+                                      })
                                     })
                                 } else {
                                   next()
@@ -157,7 +162,7 @@ function RouteComponent() {
                           .bash(dir, app.type, cmd)
                           .then((output) => {
                             setTerminal((c) => c + '\n' + cmd + '\n' + output)
-                            toast('Bash ran successfully')
+                            toast('Bash ran successfully', { description: 'Check the terminal for output' })
                             setCmd('')
                           })
                           .catch(() => {
@@ -186,10 +191,10 @@ function RouteComponent() {
                             .then((bash) => {
                               setTerminal((c) => c + '\n' + bash)
                               refetchDev()
-                              toast('Dev server stopped')
+                              toast(`${capitalized} stopped`, { description: 'Successfully stopped' })
                             })
                             .catch(() => {
-                              toast('Failed to stop dev server', { description: 'That stinks, my bad' })
+                              toast(`Failed to stop ${capitalized} server`, { description: 'That stinks, my bad' })
                             })
                             .finally(() => setBashing(false))
                         }}
@@ -206,10 +211,12 @@ function RouteComponent() {
                             .then((bash) => {
                               setTerminal((c) => c + '\n' + bash)
                               refetchDev()
-                              toast('Dev server started')
+                              toast(capitalized + ' started', {
+                                description: 'Successfully started',
+                              })
                             })
                             .catch(() => {
-                              toast('Failed to start dev server', { description: 'That stinks, my bad' })
+                              toast(`Failed to start ${capitalized} server`, { description: 'That stinks, my bad' })
                             })
                             .finally(() => setBashing(false))
                         }}
@@ -236,7 +243,7 @@ function RouteComponent() {
                             .bash(dir, app.type, 'npm i')
                             .then((output) => {
                               setTerminal((c) => c + '\n' + output)
-                              toast('Project created')
+                              toast(capitalized + ' project created')
                               refetchClients()
                             })
                             .catch(() => {

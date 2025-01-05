@@ -34,6 +34,7 @@ import useDirAndName from '@/hooks/useDirAndName'
 import { toast } from 'sonner'
 import { useApexStore } from '@/hooks/useApexStore'
 import { useEffect } from 'react'
+import { GetClientDevServersSchema, GetServerStatusSchema } from '@/types/schemas'
 
 export const Route = createLazyFileRoute('/projects/$name')({
   component: RouteComponent,
@@ -49,25 +50,49 @@ function RouteComponent() {
     loadApex(dir)
   }, [clear, loadApex, dir])
 
-  function deleteProject() {
-    Promise.all([Go.clients.stopDev(dir, 'web'), Go.clients.stopDev(dir, 'mobile'), Go.clients.stopDev(dir, 'desktop')]).then(() => {
-      toast('Clients Stopped', { description: 'Clients stopped for ' + name })
-      Go.server
-        .stop(dir)
-        .then(() => {
-          toast('Server Stopped', { description: 'Server stopped for ' + name })
-          Go.projects
-            .delete(dir)
+  async function deleteProject() {
+    await Go.clients
+      .devServers(dir)
+      .then((s) => GetClientDevServersSchema.parse(s))
+      .then((servers) => {
+        const promises = []
+        if (servers.web) promises.push(Go.clients.stopDev(dir, 'web'))
+        if (servers.mobile) promises.push(Go.clients.stopDev(dir, 'mobile'))
+        if (servers.desktop) promises.push(Go.clients.stopDev(dir, 'desktop'))
+        if (promises.length === 0) return
+        return Promise.all(promises)
+          .then(() => {
+            toast('Clients Stopped', { description: 'Clients stopped for ' + name })
+          })
+          .catch(() => {
+            toast('Error', { description: 'Failed to stop clients' })
+          })
+      })
+    await Go.server
+      .status(dir)
+      .then((s) => GetServerStatusSchema.parse(s))
+      .then((status) => {
+        if (status.db === 'running' || status.server === 'running') {
+          return Go.server
+            .stop(dir)
             .then(() => {
-              navigate({ to: '/' })
-              toast(name + ' deleted', {
-                description: '/Genesis/projects/' + dir,
-              })
+              toast('Server Stopped', { description: 'Server stopped for ' + name })
             })
-            .catch(() => toast('Error', { description: 'Failed to delete project' }))
+            .catch(() => {
+              toast('Error', { description: 'Failed to stop server' })
+            })
+        }
+      })
+
+    Go.projects
+      .delete(dir)
+      .then(() => {
+        navigate({ to: '/' })
+        toast(name + ' deleted', {
+          description: '/Genesis/projects/' + dir,
         })
-        .catch(() => toast('Error', { description: 'Failed to stop server' }))
-    })
+      })
+      .catch(() => toast('Error', { description: 'Failed to delete project' }))
   }
 
   return (
