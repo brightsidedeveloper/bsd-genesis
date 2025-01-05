@@ -1,9 +1,12 @@
 import {
+  AddPlanetToProject,
   CreateProject,
   DeleteProject,
+  GetActivePlanets,
   GetPort,
   GetProjects,
   GetServerStatus,
+  OpenPlanetInVSCode,
   RestartServer,
   StartServer,
   StopServer,
@@ -23,5 +26,10 @@ export default class Go {
     status: GetServerStatus,
     getPort: GetPort,
     updatePort: UpdatePort,
+  }
+  static clients = {
+    get: GetActivePlanets,
+    create: AddPlanetToProject,
+    open: OpenPlanetInVSCode,
   }
 }

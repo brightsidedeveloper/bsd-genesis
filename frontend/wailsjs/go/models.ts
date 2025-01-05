@@ -1,5 +1,19 @@
 export namespace main {
 	
+	export class ClientApp {
+	    type: string;
+	    exists: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new ClientApp(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.type = source["type"];
+	        this.exists = source["exists"];
+	    }
+	}
 	export class NewProjectOptions {
 	    dir: string;
 	    name: string;

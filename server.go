@@ -14,7 +14,7 @@ func (a *App) StartServer(dir string) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(filepath.Join(a.ProjectsDir, dir), "star")
 	composeFile := filepath.Join(projectPath, "docker-compose.yaml")
 	mainFile := filepath.Join(projectPath, "main.go")
 
@@ -61,7 +61,7 @@ func (a *App) StopServer(dir string) error {
 	defer a.mu.Unlock()
 	fmt.Println("🛑 Stopping server for:", dir)
 
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(filepath.Join(a.ProjectsDir, dir), "star")
 	composeFile := filepath.Join(projectPath, "docker-compose.yaml")
 
 	// ✅ Kill orphaned Go processes
@@ -142,7 +142,7 @@ func (a *App) GetPort(dir string) string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(filepath.Join(a.ProjectsDir, dir), "star")
 	envFilePath := filepath.Join(projectPath, ".env")
 
 	// ✅ Ensure .env file exists
@@ -175,7 +175,7 @@ func (a *App) UpdatePort(dir, newPort string) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(filepath.Join(a.ProjectsDir, dir), "star")
 	envFilePath := filepath.Join(projectPath, ".env")
 
 	// ✅ Ensure .env file exists before modifying
@@ -232,7 +232,7 @@ type ServerStatus struct {
 
 // ✅ Function to Check Server & DB Status
 func (a *App) GetServerStatus(dir string) ServerStatus {
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(filepath.Join(a.ProjectsDir, dir), "star")
 	composeFile := filepath.Join(projectPath, "docker-compose.yaml")
 
 	status := ServerStatus{

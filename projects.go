@@ -53,7 +53,7 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 
 	// Copy project template to new directory
 	templatePath := filepath.Join("universe", "bsd-solar-system") // Change path if needed
-	if err := copyTemplate(templatePath, projectPath); err != nil {
+	if err := copyTemplate(templatePath, filepath.Join(projectPath, "star")); err != nil {
 		return fmt.Errorf("❌ Failed to copy template: %v", err)
 	}
 
