@@ -61,13 +61,13 @@ func getProjectMetadata(dir string) ([]ProjectInfo, error) {
 func readProjectJSON(filePath string) (ProjectData, error) {
 	file, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, err
+		return ProjectData{}, err
 	}
 
 	var data ProjectData
 	if err := json.Unmarshal(file, &data); err != nil {
 		fmt.Println("❌ Error parsing JSON in", filePath, ":", err)
-		return nil, err
+		return ProjectData{}, err
 	}
 
 	return data, nil

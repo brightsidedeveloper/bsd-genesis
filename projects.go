@@ -6,7 +6,11 @@ import (
 	"path/filepath"
 )
 
-type ProjectData map[string]interface{}
+type ProjectData struct {
+	Name        string `json:"name"`
+	Database    string `json:"database"`
+	Description string `json:"description"`
+}
 type ProjectInfo struct {
 	Dir     string      `json:"dir"`
 	Project ProjectData `json:"project"`
@@ -33,9 +37,10 @@ func (a *App) GetProjects() []ProjectInfo {
 }
 
 type NewProjectOptions struct {
-	Dir      string `json:"dir"`
-	Name     string `json:"name"`
-	Database string `json:"database"`
+	Dir         string `json:"dir"`
+	Name        string `json:"name"`
+	Database    string `json:"database"`
+	Description string `json:"description"`
 }
 
 func (a *App) CreateProject(o NewProjectOptions) error {
@@ -60,8 +65,9 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 	// Create and write project.json with correct metadata
 	projectFilePath := filepath.Join(projectPath, "project.json")
 	projectData := ProjectData{
-		"name":     o.Name,
-		"database": o.Database,
+		Name:        o.Name,
+		Database:    o.Database,
+		Description: o.Description,
 	}
 
 	if err := writeProjectJSON(projectFilePath, projectData); err != nil {

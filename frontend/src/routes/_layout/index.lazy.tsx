@@ -20,6 +20,7 @@ import { GetProjectsType, GetProjectsSchema, CreateProjectSchema } from '@/types
 import Go from '@/Go'
 import { nameToDir } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Textarea } from '@/components/ui/textarea'
 
 export const Route = createLazyFileRoute('/_layout/')({
   component: RouteComponent,
@@ -67,6 +68,7 @@ function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => voi
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
   const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
   const [database, setDatabase] = useState<'postgres' | ''>('')
 
   function handleSubmit() {
@@ -77,7 +79,8 @@ function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => voi
     if (projectDirAndNameTuple.some(([d, n]) => d === dir || n.toLowerCase().includes(trimmedName.toLowerCase())))
       return toast('Project Already Exists', { description: 'Please choose a different name.' })
 
-    const project = CreateProjectSchema.parse({ name: trimmedName, database, dir })
+    const project = CreateProjectSchema.parse({ name: trimmedName, description, database, dir })
+    console.log(project)
 
     Go.projects.create(project).then(() => {
       refetch()
@@ -98,6 +101,18 @@ function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => voi
             Name
           </Label>
           <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="BrightSide Portal" className="col-span-3" />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="description" className="text-right">
+            Description
+          </Label>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="A portal for the BrightSide team"
+            className="col-span-3"
+          />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label className="text-right">Database</Label>

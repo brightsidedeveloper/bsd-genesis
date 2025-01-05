@@ -23,6 +23,7 @@ export type GetProjectsType = z.infer<typeof GetProjectsSchema>
 export const CreateProjectSchema = z.object({
   dir: z.string(),
   name: z.string(),
+  description: z.string().optional(),
   database: z.literal('postgres'),
 })
 

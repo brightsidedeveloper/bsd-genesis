@@ -14,8 +14,8 @@ function RouteComponent() {
         <h1 className="text-3xl px-4 font-bold capitalize">{pathname.split('/')[1] || 'projects'}</h1>
       </header>
       <aside className="bg-card min-h-screen overflow-y-auto w-52 fixed top-0 left-0 px-4 pb-4 flex flex-col gap-3 border-r">
-        <img src={logo} alt="logo" className="w-full" />
-        <div className="flex-1 flex flex-col gap-2">
+        <img src={logo} alt="logo" className="w-full -mt-1.5" />
+        <div className="flex-1 flex flex-col gap-2 -translate-y-1">
           {routes.map(({ to, label, Icon }) => (
             <Link
               key={to}
