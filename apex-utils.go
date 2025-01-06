@@ -347,7 +347,7 @@ func generateTSAPIClient(apex *ApexData, projectDir, subDir, port string) error 
 
 func copyAndModifyRequestFile(destPath string, baseURL string) error {
 	// Read the original request.ts file from embedded source or predefined location
-	originalFilePath := "templates/request.ts" // Change this to the correct template path
+	originalFilePath := destPath // Change this to the correct template path
 	input, err := os.ReadFile(originalFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to read request.ts template: %w", err)
