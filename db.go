@@ -4,11 +4,15 @@ import (
 	"bufio"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 func (a *App) GetDSN(dir string) (string, error) {
@@ -307,4 +311,113 @@ func (a *App) ExecuteSQLQuery(dir string, query string) ([]map[string]interface{
 
 	fmt.Println("✅ Query executed successfully:", results)
 	return results, nil
+}
+
+// SQLQuery represents a single query in the history
+type SQLQuery struct {
+	ID        string `json:"id"`
+	Timestamp string `json:"timestamp"`
+	Query     string `json:"query"`
+}
+
+// SQLQueryHistory is a list of queries stored in sql-editor.json
+type SQLQueryHistory struct {
+	Queries []SQLQuery `json:"queries"`
+}
+
+// GetSQLHistory loads the sql-editor.json file and returns the stored queries
+func (a *App) GetSQLHistory(dir string) (*SQLQueryHistory, error) {
+	filePath := a.getSQLHistoryFilePath(dir)
+
+	// Check if the file exists
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		fmt.Println("⚠️ No SQL history found, returning empty history.")
+		return &SQLQueryHistory{}, nil // Return an empty history if the file doesn't exist
+	}
+
+	// Read the file
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("❌ Failed to read SQL history: %v", err)
+	}
+
+	// Parse JSON
+	var history SQLQueryHistory
+	if err := json.Unmarshal(data, &history); err != nil {
+		return nil, fmt.Errorf("❌ Failed to parse SQL history: %v", err)
+	}
+	fmt.Println("✅ SQL history loaded successfully!", history)
+	return &history, nil
+}
+
+// SaveSQLQuery appends a new query to sql-editor.json
+func (a *App) SaveSQLQuery(dir, query string) error {
+	filePath := a.getSQLHistoryFilePath(dir)
+
+	// ✅ Load existing history
+	history, err := a.GetSQLHistory(dir)
+	if err != nil {
+		return err
+	}
+
+	// ✅ Create a new query entry
+	newQuery := SQLQuery{
+		ID:        uuid.New().String(), // Generate a unique ID
+		Timestamp: time.Now().Format(time.RFC3339),
+		Query:     query,
+	}
+
+	// ✅ Append to history and save
+	history.Queries = append(history.Queries, newQuery)
+	data, err := json.MarshalIndent(history, "", "  ")
+	if err != nil {
+		return fmt.Errorf("❌ Failed to serialize SQL history: %v", err)
+	}
+
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return fmt.Errorf("❌ Failed to write SQL history: %v", err)
+	}
+
+	fmt.Println("✅ SQL query saved successfully!")
+	return nil
+}
+
+// DeleteSQLQuery removes a query from sql-editor.json by ID
+func (a *App) DeleteSQLQuery(dir, queryID string) error {
+	filePath := a.getSQLHistoryFilePath(dir)
+
+	// ✅ Load existing history
+	history, err := a.GetSQLHistory(dir)
+	if err != nil {
+		return err
+	}
+
+	// ✅ Filter out the query with the given ID
+	newQueries := []SQLQuery{}
+	found := false
+	for _, q := range history.Queries {
+		if q.ID == queryID {
+			found = true
+			continue
+		}
+		newQueries = append(newQueries, q)
+	}
+
+	if !found {
+		return fmt.Errorf("⚠️ Query with ID %s not found", queryID)
+	}
+
+	// ✅ Update and save the modified history
+	history.Queries = newQueries
+	data, err := json.MarshalIndent(history, "", "  ")
+	if err != nil {
+		return fmt.Errorf("❌ Failed to serialize updated SQL history: %v", err)
+	}
+
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return fmt.Errorf("❌ Failed to update SQL history: %v", err)
+	}
+
+	fmt.Printf("✅ Deleted query with ID: %s\n", queryID)
+	return nil
 }

@@ -19,8 +19,10 @@ import { Route as rootRoute } from './routes/__root'
 const LayoutRouteLazyImport = createFileRoute('/_layout')()
 const LayoutIndexLazyImport = createFileRoute('/_layout/')()
 const LayoutSettingsLazyImport = createFileRoute('/_layout/settings')()
+const LayoutProjectsListLazyImport = createFileRoute('/_layout/projects-list')()
 const LayoutPackagesLazyImport = createFileRoute('/_layout/packages')()
 const LayoutModulesLazyImport = createFileRoute('/_layout/modules')()
+const LayoutClustersLazyImport = createFileRoute('/_layout/clusters')()
 const ProjectsNameRouteLazyImport = createFileRoute('/projects/$name')()
 const ProjectsNameIndexLazyImport = createFileRoute('/projects/$name/')()
 const ProjectsNameTspackLazyImport = createFileRoute('/projects/$name/tspack')()
@@ -69,6 +71,14 @@ const LayoutSettingsLazyRoute = LayoutSettingsLazyImport.update({
   import('./routes/_layout/settings.lazy').then((d) => d.Route),
 )
 
+const LayoutProjectsListLazyRoute = LayoutProjectsListLazyImport.update({
+  id: '/projects-list',
+  path: '/projects-list',
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_layout/projects-list.lazy').then((d) => d.Route),
+)
+
 const LayoutPackagesLazyRoute = LayoutPackagesLazyImport.update({
   id: '/packages',
   path: '/packages',
@@ -83,6 +93,14 @@ const LayoutModulesLazyRoute = LayoutModulesLazyImport.update({
   getParentRoute: () => LayoutRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_layout/modules.lazy').then((d) => d.Route),
+)
+
+const LayoutClustersLazyRoute = LayoutClustersLazyImport.update({
+  id: '/clusters',
+  path: '/clusters',
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_layout/clusters.lazy').then((d) => d.Route),
 )
 
 const ProjectsNameRouteLazyRoute = ProjectsNameRouteLazyImport.update({
@@ -232,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsNameRouteLazyImport
       parentRoute: typeof rootRoute
     }
+    '/_layout/clusters': {
+      id: '/_layout/clusters'
+      path: '/clusters'
+      fullPath: '/clusters'
+      preLoaderRoute: typeof LayoutClustersLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
+    }
     '/_layout/modules': {
       id: '/_layout/modules'
       path: '/modules'
@@ -244,6 +269,13 @@ declare module '@tanstack/react-router' {
       path: '/packages'
       fullPath: '/packages'
       preLoaderRoute: typeof LayoutPackagesLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
+    }
+    '/_layout/projects-list': {
+      id: '/_layout/projects-list'
+      path: '/projects-list'
+      fullPath: '/projects-list'
+      preLoaderRoute: typeof LayoutProjectsListLazyImport
       parentRoute: typeof LayoutRouteLazyImport
     }
     '/_layout/settings': {
@@ -371,15 +403,19 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface LayoutRouteLazyRouteChildren {
+  LayoutClustersLazyRoute: typeof LayoutClustersLazyRoute
   LayoutModulesLazyRoute: typeof LayoutModulesLazyRoute
   LayoutPackagesLazyRoute: typeof LayoutPackagesLazyRoute
+  LayoutProjectsListLazyRoute: typeof LayoutProjectsListLazyRoute
   LayoutSettingsLazyRoute: typeof LayoutSettingsLazyRoute
   LayoutIndexLazyRoute: typeof LayoutIndexLazyRoute
 }
 
 const LayoutRouteLazyRouteChildren: LayoutRouteLazyRouteChildren = {
+  LayoutClustersLazyRoute: LayoutClustersLazyRoute,
   LayoutModulesLazyRoute: LayoutModulesLazyRoute,
   LayoutPackagesLazyRoute: LayoutPackagesLazyRoute,
+  LayoutProjectsListLazyRoute: LayoutProjectsListLazyRoute,
   LayoutSettingsLazyRoute: LayoutSettingsLazyRoute,
   LayoutIndexLazyRoute: LayoutIndexLazyRoute,
 }
@@ -432,8 +468,10 @@ const ProjectsNameRouteLazyRouteWithChildren =
 export interface FileRoutesByFullPath {
   '': typeof LayoutRouteLazyRouteWithChildren
   '/projects/$name': typeof ProjectsNameRouteLazyRouteWithChildren
+  '/clusters': typeof LayoutClustersLazyRoute
   '/modules': typeof LayoutModulesLazyRoute
   '/packages': typeof LayoutPackagesLazyRoute
+  '/projects-list': typeof LayoutProjectsListLazyRoute
   '/settings': typeof LayoutSettingsLazyRoute
   '/': typeof LayoutIndexLazyRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
@@ -454,8 +492,10 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '/clusters': typeof LayoutClustersLazyRoute
   '/modules': typeof LayoutModulesLazyRoute
   '/packages': typeof LayoutPackagesLazyRoute
+  '/projects-list': typeof LayoutProjectsListLazyRoute
   '/settings': typeof LayoutSettingsLazyRoute
   '/': typeof LayoutIndexLazyRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
@@ -479,8 +519,10 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_layout': typeof LayoutRouteLazyRouteWithChildren
   '/projects/$name': typeof ProjectsNameRouteLazyRouteWithChildren
+  '/_layout/clusters': typeof LayoutClustersLazyRoute
   '/_layout/modules': typeof LayoutModulesLazyRoute
   '/_layout/packages': typeof LayoutPackagesLazyRoute
+  '/_layout/projects-list': typeof LayoutProjectsListLazyRoute
   '/_layout/settings': typeof LayoutSettingsLazyRoute
   '/_layout/': typeof LayoutIndexLazyRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
@@ -505,8 +547,10 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/projects/$name'
+    | '/clusters'
     | '/modules'
     | '/packages'
+    | '/projects-list'
     | '/settings'
     | '/'
     | '/projects/$name/apex'
@@ -526,8 +570,10 @@ export interface FileRouteTypes {
     | '/projects/$name/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/clusters'
     | '/modules'
     | '/packages'
+    | '/projects-list'
     | '/settings'
     | '/'
     | '/projects/$name/apex'
@@ -549,8 +595,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_layout'
     | '/projects/$name'
+    | '/_layout/clusters'
     | '/_layout/modules'
     | '/_layout/packages'
+    | '/_layout/projects-list'
     | '/_layout/settings'
     | '/_layout/'
     | '/projects/$name/apex'
@@ -598,8 +646,10 @@ export const routeTree = rootRoute
     "/_layout": {
       "filePath": "_layout/route.lazy.tsx",
       "children": [
+        "/_layout/clusters",
         "/_layout/modules",
         "/_layout/packages",
+        "/_layout/projects-list",
         "/_layout/settings",
         "/_layout/"
       ]
@@ -624,12 +674,20 @@ export const routeTree = rootRoute
         "/projects/$name/"
       ]
     },
+    "/_layout/clusters": {
+      "filePath": "_layout/clusters.lazy.tsx",
+      "parent": "/_layout"
+    },
     "/_layout/modules": {
       "filePath": "_layout/modules.lazy.tsx",
       "parent": "/_layout"
     },
     "/_layout/packages": {
       "filePath": "_layout/packages.lazy.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/projects-list": {
+      "filePath": "_layout/projects-list.lazy.tsx",
       "parent": "/_layout"
     },
     "/_layout/settings": {

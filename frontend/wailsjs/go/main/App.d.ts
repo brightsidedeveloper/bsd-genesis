@@ -14,6 +14,8 @@ export function DeletePlanet(arg1:string,arg2:string):Promise<void>;
 
 export function DeleteProject(arg1:string):Promise<void>;
 
+export function DeleteSQLQuery(arg1:string,arg2:string):Promise<void>;
+
 export function DisconnectDB():Promise<void>;
 
 export function DropTable(arg1:string,arg2:string):Promise<void>;
@@ -34,6 +36,8 @@ export function GetPort(arg1:string):Promise<string>;
 
 export function GetProjects():Promise<Array<main.ProjectInfo>>;
 
+export function GetSQLHistory(arg1:string):Promise<main.SQLQueryHistory>;
+
 export function GetServerStatus(arg1:string):Promise<main.ServerStatus>;
 
 export function GetTableSchema(arg1:string,arg2:string):Promise<{[key: string]: string}>;
@@ -42,11 +46,15 @@ export function GetTables(arg1:string):Promise<Array<string>>;
 
 export function OpenPlanetInVSCode(arg1:string,arg2:string):Promise<void>;
 
+export function OpenProjectInVSCode(arg1:string):Promise<void>;
+
 export function RestartServer(arg1:string):Promise<void>;
 
 export function RunBash(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function SaveApex(arg1:string,arg2:main.ApexData):Promise<void>;
+
+export function SaveSQLQuery(arg1:string,arg2:string):Promise<void>;
 
 export function StartDevServer(arg1:string,arg2:string):Promise<string>;
 

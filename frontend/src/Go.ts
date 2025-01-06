@@ -5,6 +5,7 @@ import {
   CreateTable,
   DeletePlanet,
   DeleteProject,
+  DeleteSQLQuery,
   DisconnectDB,
   DropTable,
   ExecuteSQLQuery,
@@ -15,12 +16,15 @@ import {
   GetPort,
   GetProjects,
   GetServerStatus,
+  GetSQLHistory,
   GetTables,
   GetTableSchema,
   OpenPlanetInVSCode,
+  OpenProjectInVSCode,
   RestartServer,
   RunBash,
   SaveApex,
+  SaveSQLQuery,
   StartDevServer,
   StartServer,
   StopDevServer,
@@ -33,6 +37,7 @@ export default class Go {
     get: GetProjects,
     create: CreateProject,
     delete: DeleteProject,
+    open: OpenProjectInVSCode,
   }
   static server = {
     start: StartServer,
@@ -65,5 +70,10 @@ export default class Go {
     getTablesCols: GetTableSchema,
     dropTable: DropTable,
     query: ExecuteSQLQuery,
+  }
+  static sqlEditor = {
+    get: GetSQLHistory,
+    save: SaveSQLQuery,
+    del: DeleteSQLQuery,
   }
 }

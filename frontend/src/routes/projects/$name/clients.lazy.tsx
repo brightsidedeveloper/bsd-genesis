@@ -60,7 +60,7 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold">Clients</h2>
+      <h2 className="text-2xl font-semibold">Planets</h2>
       <hr />
       <h3 className="text-lg font-semibold">Terminal</h3>
       {terminal ? (

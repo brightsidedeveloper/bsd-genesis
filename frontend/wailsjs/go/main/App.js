@@ -26,6 +26,10 @@ export function DeleteProject(arg1) {
   return window['go']['main']['App']['DeleteProject'](arg1);
 }
 
+export function DeleteSQLQuery(arg1, arg2) {
+  return window['go']['main']['App']['DeleteSQLQuery'](arg1, arg2);
+}
+
 export function DisconnectDB() {
   return window['go']['main']['App']['DisconnectDB']();
 }
@@ -66,6 +70,10 @@ export function GetProjects() {
   return window['go']['main']['App']['GetProjects']();
 }
 
+export function GetSQLHistory(arg1) {
+  return window['go']['main']['App']['GetSQLHistory'](arg1);
+}
+
 export function GetServerStatus(arg1) {
   return window['go']['main']['App']['GetServerStatus'](arg1);
 }
@@ -82,6 +90,10 @@ export function OpenPlanetInVSCode(arg1, arg2) {
   return window['go']['main']['App']['OpenPlanetInVSCode'](arg1, arg2);
 }
 
+export function OpenProjectInVSCode(arg1) {
+  return window['go']['main']['App']['OpenProjectInVSCode'](arg1);
+}
+
 export function RestartServer(arg1) {
   return window['go']['main']['App']['RestartServer'](arg1);
 }
@@ -92,6 +104,10 @@ export function RunBash(arg1, arg2, arg3) {
 
 export function SaveApex(arg1, arg2) {
   return window['go']['main']['App']['SaveApex'](arg1, arg2);
+}
+
+export function SaveSQLQuery(arg1, arg2) {
+  return window['go']['main']['App']['SaveSQLQuery'](arg1, arg2);
 }
 
 export function StartDevServer(arg1, arg2) {

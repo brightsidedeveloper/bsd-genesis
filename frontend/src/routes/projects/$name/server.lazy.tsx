@@ -82,7 +82,7 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold">Server</h2>
+      <h2 className="text-2xl font-semibold">Star</h2>
       <hr />
       <h3 className="text-lg font-semibold">Status</h3>
       <div className="flex space-x-4 items-center">
@@ -148,10 +148,10 @@ function RouteComponent() {
               .finally(() => setStarting(false))
           }}
         >
-          {status?.server === 'running' ? 'Restart Server' : 'Start Server'}
+          {status?.server === 'running' ? 'Restart Star' : 'Start Star'}
         </Button>
         <Button
-          disabled={status?.server === 'stopped' || status?.db === 'stopped' || starting || stopping}
+          disabled={(status?.server === 'stopped' && status?.db === 'stopped') || starting || stopping}
           variant="destructive"
           onClick={() => {
             setStopping(true)
@@ -172,7 +172,7 @@ function RouteComponent() {
               .finally(() => setStopping(false))
           }}
         >
-          Stop Server
+          Stop Star
         </Button>
       </div>
     </div>

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -85,6 +86,14 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 		return fmt.Errorf("❌ Failed to write apex.json: %v", err)
 	}
 
+	// ✅ Create sql-editor.json (ensure query history exists)
+	sqlEditorFilePath := filepath.Join(projectPath, "sql-editor.json")
+	sqlHistory := SQLQueryHistory{Queries: []SQLQuery{}}
+
+	if err := writeJSON(sqlEditorFilePath, sqlHistory); err != nil {
+		return fmt.Errorf("❌ Failed to write sql-editor.json: %v", err)
+	}
+
 	fmt.Println("✅ Project successfully created at:", projectPath)
 	return nil
 }
@@ -107,5 +116,29 @@ func (a *App) DeleteProject(dir string) error {
 	}
 
 	fmt.Println("✅ Project successfully deleted:", projectPath)
+	return nil
+}
+
+// OpenProjectInVSCode opens the given project directory in VS Code
+func (a *App) OpenProjectInVSCode(dir string) error {
+	projectPath := filepath.Join(a.ProjectsDir, dir)
+
+	// ✅ Ensure the directory exists
+	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
+		return fmt.Errorf("❌ Project '%s' does not exist in %s", dir, a.ProjectsDir)
+	}
+
+	// ✅ Open the project in VS Code
+	fmt.Println("🚀 Opening project", dir, "in VS Code...")
+	cmd := exec.Command("code", projectPath)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// ✅ Run the command
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("❌ Failed to open VS Code: %v", err)
+	}
+
+	fmt.Println("✅ VS Code opened successfully for project", dir)
 	return nil
 }

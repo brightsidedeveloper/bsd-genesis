@@ -8,10 +8,10 @@ import {
   Database,
   GitGraph,
   Github,
+  Keyboard,
   Library,
   Package,
   PcCase,
-  Replace,
   Ship,
   Signpost,
   Table,
@@ -107,21 +107,34 @@ function RouteComponent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="bg-card border-b pl-52 py-2 h-[--header-height]">
+      <header className="bg-card border-b pl-52 py-2 h-[--header-height] flex items-center justify-between">
         <h1 className="text-3xl px-4 font-bold">{name}</h1>
+        <div className="px-4">
+          <Button
+            variant="secondary"
+            onClick={() =>
+              Go.projects
+                .open(dir)
+                .then(() => toast('Opened in VSCode'))
+                .catch(() => toast('Failed to open in VSCode'))
+            }
+          >
+            code .
+          </Button>
+        </div>
       </header>
       <aside className="bg-card min-h-screen overflow-y-auto w-52 fixed top-0 left-0 px-4 pb-4 flex flex-col gap-3 border-r">
         <img src={logo} alt="logo" className="w-full -mt-1.5" />
         <div className="flex-1 flex flex-col gap-2 -translate-y-1">
           <Link
-            to="/"
+            to="/projects-list"
             className="py-1 px-2 rounded-lg hover:bg-primary/15 flex items-center gap-2 mb-2"
             activeProps={{
               className: 'bg-primary/10',
             }}
           >
             <ArrowLeft className="size-5" />
-            Back to Projects
+            Solar Systems
           </Link>
           {routes.map(({ to, label, Icon }) => (
             <Link
@@ -179,14 +192,14 @@ function RouteComponent() {
 
 const routes = [
   { to: '/projects/$name', label: 'Overview', Icon: TableOfContents },
-  { to: '/projects/$name/server', label: 'Server', Icon: PcCase },
-  { to: '/projects/$name/clients', label: 'Clients', Icon: AppWindowMac },
+  { to: '/projects/$name/server', label: 'Star', Icon: PcCase },
+  { to: '/projects/$name/clients', label: 'Planets', Icon: AppWindowMac },
   { to: '/projects/$name/auth', label: 'Authentication', Icon: Users },
   { to: '/projects/$name/tables', label: 'Tables', Icon: Table },
-  { to: '/projects/$name/apex', label: 'APEX', Icon: Aperture },
-  { to: '/projects/$name/endpoints', label: 'Endpoints', Icon: Signpost },
-  { to: '/projects/$name/queries', label: 'Queries', Icon: Replace },
+  { to: '/projects/$name/queries', label: 'SQL Editor', Icon: Keyboard },
   { to: '/projects/$name/schemas', label: 'Schemas', Icon: Braces },
+  { to: '/projects/$name/endpoints', label: 'Endpoints', Icon: Signpost },
+  { to: '/projects/$name/apex', label: 'APEX', Icon: Aperture },
   { to: '/projects/$name/q1', label: 'Q1 Storage', Icon: Database },
   { to: '/projects/$name/gomod', label: 'Go Mod', Icon: Library },
   { to: '/projects/$name/tspack', label: 'TS Pack', Icon: Package },

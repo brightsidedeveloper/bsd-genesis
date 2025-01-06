@@ -52,3 +52,16 @@ export const GetClientDevServersSchema = z.object({
 })
 
 export type GetClientDevServersType = z.infer<typeof GetClientDevServersSchema>
+
+export const SQLQuerySchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  query: z.string(),
+  timestamp: z.string(),
+})
+export const GetSQLHistorySchema = z.object({
+  queries: z.array(SQLQuerySchema),
+})
+
+export type GetSQLHistoryType = z.infer<typeof GetSQLHistorySchema>
+export type SQLQueryType = z.infer<typeof SQLQuerySchema>
