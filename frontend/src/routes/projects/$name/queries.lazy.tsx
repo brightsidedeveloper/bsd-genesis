@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { createPortal } from 'react-dom'
+import { Trash } from 'lucide-react'
 export const Route = createLazyFileRoute('/projects/$name/queries')({
   component: RouteComponent,
 })
@@ -46,7 +47,10 @@ function RouteComponent() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">SQL Editor</h2>
+        <h2 className="text-2xl font-semibold">
+          SQL {tab === 'queries' ? 'Queries' : 'Editor'}
+          {tab === 'editor' && <>&nbsp;&nbsp;&nbsp;&nbsp;</>}
+        </h2>
         <Tabs value={tab} onValueChange={(t) => setTab(t as 'queries' | 'editor')}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="queries">Queries</TabsTrigger>
@@ -385,9 +389,22 @@ function SQLEditor() {
           <TooltipProvider key={id}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className={cn('hover:bg-primary/10 w-full rounded-lg p-2 ')} onClick={() => setSql(query)}>
-                  <pre className="text-xs truncate w-44">{query}</pre>
-                </button>
+                <div className="flex items-center gap-0.5">
+                  <button className={cn('hover:bg-primary/10 rounded-lg p-1.5 cols-span-3')} onClick={() => setSql(query)}>
+                    <pre className="text-xs truncate w-36">{query}</pre>
+                  </button>
+                  <button
+                    className="col-span-1"
+                    onClick={() =>
+                      Go.sqlEditor
+                        .del(dir, id)
+                        .then(invalidateSqlHistory)
+                        .catch(() => toast.error('Failed to delete query'))
+                    }
+                  >
+                    <Trash className="size-4 text-destructive hover:brightness-110" />
+                  </button>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>{query}</p>

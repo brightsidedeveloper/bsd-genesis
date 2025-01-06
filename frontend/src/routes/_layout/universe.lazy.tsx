@@ -1,9 +1,9 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 
-export const Route = createLazyFileRoute('/_layout/modules')({
+export const Route = createLazyFileRoute('/_layout/universe')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <div>TODO</div>
+  return <div>Super Clusters!</div>
 }

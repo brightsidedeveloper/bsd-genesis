@@ -5,5 +5,5 @@ export const Route = createLazyFileRoute('/_layout/clusters')({
 })
 
 function RouteComponent() {
-  return <div>Galaxies</div>
+  return <div>Clusters</div>
 }
