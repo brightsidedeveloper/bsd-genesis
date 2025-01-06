@@ -27,6 +27,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { createPortal } from 'react-dom'
 export const Route = createLazyFileRoute('/projects/$name/queries')({
   component: RouteComponent,
 })
@@ -52,13 +53,15 @@ function RouteComponent() {
             <TabsTrigger value="editor">Editor</TabsTrigger>
           </TabsList>
         </Tabs>
-        <div className={cn('flex gap-4', (!isDirty || tab === 'editor') && 'opacity-0 pointer-events-none')}>
-          <Button disabled={!isDirty || tab === 'editor'} size="sm" variant="secondary" onClick={() => reset()}>
-            Cancel
-          </Button>
-          <Button size="sm" onClick={() => saveApex(dir)} disabled={!isDirty || tab === 'editor'}>
-            Write File
-          </Button>
+        <div id="portal-connected" className="w-fit relative">
+          <div className={cn('flex gap-4', (!isDirty || tab === 'editor') && 'opacity-0 pointer-events-none')}>
+            <Button disabled={!isDirty || tab === 'editor'} size="sm" variant="secondary" onClick={() => reset()}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={() => saveApex(dir)} disabled={!isDirty || tab === 'editor'}>
+              Write File
+            </Button>
+          </div>
         </div>
       </div>
       <hr />
@@ -280,6 +283,12 @@ function SQLEditor() {
 
   return (
     <div className="flex">
+      {createPortal(
+        <div className="absolute z-10 top-1/2 -translate-y-1/2 right-4">
+          {connected ? <Label className="text-green-500">Connected</Label> : <Label className="text-destructive">Disconnected</Label>}
+        </div>,
+        document.getElementById('portal-connected')!
+      )}
       <div className="flex-1 pr-4">
         <form
           onSubmit={(e) => {
