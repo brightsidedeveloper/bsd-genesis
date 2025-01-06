@@ -28,9 +28,7 @@ import { Input } from '@/components/ui/input'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { createPortal } from 'react-dom'
-import { Check, ChevronsUpDown, Trash } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Trash } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 export const Route = createLazyFileRoute('/projects/$name/queries')({
   component: RouteComponent,
@@ -161,12 +159,6 @@ function CreateQueryDialog() {
                 <TabsTrigger value="CUSTOM">CUSTOM</TabsTrigger>
               </TabsList>
             </div>
-            <TabsContent value="SELECT">
-              <CreateSelectQuery />
-            </TabsContent>
-            <TabsContent value="INSERT">Insert</TabsContent>
-            <TabsContent value="UPDATE">Update</TabsContent>
-            <TabsContent value="DELETE">Delete</TabsContent>
             <TabsContent value="CUSTOM">
               <div className="flex flex-col gap-2">
                 <Label>Custom</Label>
@@ -197,92 +189,6 @@ function CreateQueryDialog() {
               </Select>
             </div>
           )}
-
-          {/* <div className="flex flex-col gap-2">
-            <Label>Select</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-                  {schema ? schemaOptions.find((s) => schema === s) : 'Select Endpoint...'}
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0">
-                <Command>
-                  <CommandInput placeholder="Search Schema..." className="h-9" />
-                  <CommandList>
-                    <CommandEmpty>No endpoints found.</CommandEmpty>
-                    <CommandGroup>
-                      {schemaOptions.map((s) => (
-                        <CommandItem
-                          key={s}
-                          value={s}
-                          onSelect={() => {
-                            setSchema(schema === s ? '' : s)
-                            setOpen(false)
-                          }}
-                        >
-                          {s}
-                          <Check className={cn('ml-auto', s === schema ? 'opacity-100' : 'opacity-0')} />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div> */}
-          {/* <div className="flex flex-col gap-2">
-            <Label>Method</Label>
-            <Select value={method} onValueChange={(m: MethodEnumType) => setMethod(m)} disabled={!endpoint}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {methodOptions.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Response</Label>
-            <Popover open={open2} onOpenChange={setOpen2}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" role="combobox" aria-expanded={open2} className="w-full justify-between">
-                  {responseSchema ? responseSchemaOptions.find((e) => responseSchema === e) : 'Select Response...'}
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0">
-                <Command>
-                  <CommandInput placeholder="Search Response Schema..." className="h-9" />
-                  <CommandList>
-                    <CommandEmpty>No schemas found.</CommandEmpty>
-                    <CommandGroup>
-                      {responseSchemaOptions.map((r) => (
-                        <CommandItem
-                          key={r}
-                          value={r}
-                          onSelect={() => {
-                            setResponseSchema(responseSchema === r ? '' : r)
-                            setOpen2(false)
-                          }}
-                        >
-                          {r}
-                          <Check className={cn('ml-auto', r === responseSchema ? 'opacity-100' : 'opacity-0')} />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div> */}
         </div>
 
         <DialogClose ref={closeRef} />
@@ -291,65 +197,6 @@ function CreateQueryDialog() {
         </DialogFooter>
       </form>
     </DialogContent>
-  )
-}
-
-function CreateSelectQuery() {
-  const { dir } = useDirAndName()
-  const { apex } = useApexStore()
-
-  const [open, setOpen] = useState(false)
-  const [schema, setSchema] = useState('')
-
-  const schemaOptions = useMemo(
-    () =>
-      apex?.schemas
-        .filter(({ type }) => {
-          return type === 'Query'
-        })
-        .map(({ name }) => name) || [],
-    [apex]
-  )
-
-  const selectedQuery = useMemo(() => apex?.schemas.find(({ name }) => name === schema), [apex, schema])
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-2">
-        <Label>Query Params</Label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
-              {schema ? schemaOptions.find((s) => schema === s) : 'Select Query Params...'}
-              <ChevronsUpDown className="opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="p-0">
-            <Command>
-              <CommandInput placeholder="Search Schema..." className="h-9" />
-              <CommandList>
-                <CommandEmpty>No endpoints found.</CommandEmpty>
-                <CommandGroup>
-                  {schemaOptions.map((s) => (
-                    <CommandItem
-                      key={s}
-                      value={s}
-                      onSelect={() => {
-                        setSchema(schema === s ? '' : s)
-                        setOpen(false)
-                      }}
-                    >
-                      {s}
-                      <Check className={cn('ml-auto', s === schema ? 'opacity-100' : 'opacity-0')} />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
-    </div>
   )
 }
 
