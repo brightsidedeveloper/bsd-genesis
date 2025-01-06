@@ -28,7 +28,10 @@ import { Input } from '@/components/ui/input'
 import { TabsContent } from '@radix-ui/react-tabs'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { createPortal } from 'react-dom'
-import { Trash } from 'lucide-react'
+import { Check, ChevronsUpDown, Trash } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 export const Route = createLazyFileRoute('/projects/$name/queries')({
   component: RouteComponent,
 })
@@ -96,6 +99,7 @@ function RouteComponent() {
 
 function CreateQueryDialog() {
   const { apex } = useApexStore()
+  const { dir } = useDirAndName()
 
   const [name, setName] = useState('')
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -117,6 +121,21 @@ function CreateQueryDialog() {
 
   const [tab, setTab] = useState<'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'CUSTOM'>('SELECT')
 
+  const { connected } = useDB()
+  const [tables, setTables] = useState<string[]>([])
+  const [table, setTable] = useState('')
+  useEffect(() => {
+    if (!connected) return
+    Go.db
+      .tables(dir)
+      .then((res) => {
+        console.log('📋 Tables received from Go:', res)
+        if (res) setTables(res)
+        else toast.error('Failed to get tables')
+      })
+      .catch(() => toast.error('Could not get tables', { description: 'Is your server running?' }))
+  }, [connected, dir])
+
   return (
     <DialogContent>
       <form
@@ -132,11 +151,6 @@ function CreateQueryDialog() {
           <DialogDescription>Create a new query!</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" placeholder="User" value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-
           <Tabs value={tab} onValueChange={(t) => setTab(t as 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'CUSTOM')}>
             <div className="flex justify-center mb-4">
               <TabsList>
@@ -147,7 +161,9 @@ function CreateQueryDialog() {
                 <TabsTrigger value="CUSTOM">CUSTOM</TabsTrigger>
               </TabsList>
             </div>
-            <TabsContent value="SELECT">Select</TabsContent>
+            <TabsContent value="SELECT">
+              <CreateSelectQuery />
+            </TabsContent>
             <TabsContent value="INSERT">Insert</TabsContent>
             <TabsContent value="UPDATE">Update</TabsContent>
             <TabsContent value="DELETE">Delete</TabsContent>
@@ -158,6 +174,29 @@ function CreateQueryDialog() {
               </div>
             </TabsContent>
           </Tabs>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" placeholder="User" value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+
+          {connected && (
+            <div className="flex flex-col gap-2">
+              <Label>Table</Label>
+              <Select value={table} onValueChange={setTable}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {tables.map((table) => (
+                    <SelectItem key={table} value={table}>
+                      {table}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* <div className="flex flex-col gap-2">
             <Label>Select</Label>
@@ -252,6 +291,65 @@ function CreateQueryDialog() {
         </DialogFooter>
       </form>
     </DialogContent>
+  )
+}
+
+function CreateSelectQuery() {
+  const { dir } = useDirAndName()
+  const { apex } = useApexStore()
+
+  const [open, setOpen] = useState(false)
+  const [schema, setSchema] = useState('')
+
+  const schemaOptions = useMemo(
+    () =>
+      apex?.schemas
+        .filter(({ type }) => {
+          return type === 'Query'
+        })
+        .map(({ name }) => name) || [],
+    [apex]
+  )
+
+  const selectedQuery = useMemo(() => apex?.schemas.find(({ name }) => name === schema), [apex, schema])
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
+        <Label>Query Params</Label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
+              {schema ? schemaOptions.find((s) => schema === s) : 'Select Query Params...'}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0">
+            <Command>
+              <CommandInput placeholder="Search Schema..." className="h-9" />
+              <CommandList>
+                <CommandEmpty>No endpoints found.</CommandEmpty>
+                <CommandGroup>
+                  {schemaOptions.map((s) => (
+                    <CommandItem
+                      key={s}
+                      value={s}
+                      onSelect={() => {
+                        setSchema(schema === s ? '' : s)
+                        setOpen(false)
+                      }}
+                    >
+                      {s}
+                      <Check className={cn('ml-auto', s === schema ? 'opacity-100' : 'opacity-0')} />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
   )
 }
 

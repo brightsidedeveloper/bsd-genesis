@@ -88,13 +88,13 @@ function RouteComponent() {
       <div className="flex space-x-4 items-center">
         <Label>Server: </Label>
         <span className={cn('capitalize', status && (status.server === 'running' ? 'text-green-500' : 'text-destructive'))}>
-          {status ? status.server : ''}
+          {status ? status.server : <>&nbsp;</>}
         </span>
       </div>
       <div className="flex space-x-4 items-center">
         <Label>Database: </Label>
         <span className={cn('capitalize', status && (status.db === 'running' ? 'text-green-500' : 'text-destructive'))}>
-          {status ? status.db : ''}
+          {status ? status.db : <>&nbsp;</>}
         </span>
       </div>
       <div className="flex space-x-4 items-center">
