@@ -1,8 +1,13 @@
 import {
   AddPlanetToProject,
+  ConnectDB,
   CreateProject,
+  CreateTable,
   DeletePlanet,
   DeleteProject,
+  DisconnectDB,
+  DropTable,
+  ExecuteSQLQuery,
   GenerateCode,
   GetActivePlanets,
   GetApex,
@@ -10,6 +15,8 @@ import {
   GetPort,
   GetProjects,
   GetServerStatus,
+  GetTables,
+  GetTableSchema,
   OpenPlanetInVSCode,
   RestartServer,
   RunBash,
@@ -49,5 +56,14 @@ export default class Go {
     get: GetApex,
     save: SaveApex,
     generate: GenerateCode,
+  }
+  static db = {
+    connect: ConnectDB,
+    disconnect: DisconnectDB,
+    tables: GetTables,
+    createTable: CreateTable,
+    getTablesCols: GetTableSchema,
+    dropTable: DropTable,
+    query: ExecuteSQLQuery,
   }
 }

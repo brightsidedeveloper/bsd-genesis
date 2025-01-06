@@ -6,8 +6,16 @@ export function AddPlanetToProject(arg1, arg2) {
   return window['go']['main']['App']['AddPlanetToProject'](arg1, arg2);
 }
 
+export function ConnectDB(arg1) {
+  return window['go']['main']['App']['ConnectDB'](arg1);
+}
+
 export function CreateProject(arg1) {
   return window['go']['main']['App']['CreateProject'](arg1);
+}
+
+export function CreateTable(arg1, arg2, arg3) {
+  return window['go']['main']['App']['CreateTable'](arg1, arg2, arg3);
 }
 
 export function DeletePlanet(arg1, arg2) {
@@ -16,6 +24,18 @@ export function DeletePlanet(arg1, arg2) {
 
 export function DeleteProject(arg1) {
   return window['go']['main']['App']['DeleteProject'](arg1);
+}
+
+export function DisconnectDB() {
+  return window['go']['main']['App']['DisconnectDB']();
+}
+
+export function DropTable(arg1, arg2) {
+  return window['go']['main']['App']['DropTable'](arg1, arg2);
+}
+
+export function ExecuteSQLQuery(arg1, arg2) {
+  return window['go']['main']['App']['ExecuteSQLQuery'](arg1, arg2);
 }
 
 export function GenerateCode(arg1) {
@@ -28,6 +48,10 @@ export function GetActivePlanets(arg1) {
 
 export function GetApex(arg1) {
   return window['go']['main']['App']['GetApex'](arg1);
+}
+
+export function GetDSN(arg1) {
+  return window['go']['main']['App']['GetDSN'](arg1);
 }
 
 export function GetDevServersStatus(arg1) {
@@ -44,6 +68,14 @@ export function GetProjects() {
 
 export function GetServerStatus(arg1) {
   return window['go']['main']['App']['GetServerStatus'](arg1);
+}
+
+export function GetTableSchema(arg1, arg2) {
+  return window['go']['main']['App']['GetTableSchema'](arg1, arg2);
+}
+
+export function GetTables(arg1) {
+  return window['go']['main']['App']['GetTables'](arg1);
 }
 
 export function OpenPlanetInVSCode(arg1, arg2) {

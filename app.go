@@ -2,13 +2,17 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"sync"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type App struct {
 	ctx         context.Context
 	mu          sync.Mutex
 	ProjectsDir string
+	db          *sql.DB
 }
 
 func NewApp() *App {

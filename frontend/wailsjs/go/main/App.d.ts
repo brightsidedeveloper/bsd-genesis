@@ -4,17 +4,29 @@ import {main} from '../models';
 
 export function AddPlanetToProject(arg1:string,arg2:string):Promise<void>;
 
+export function ConnectDB(arg1:string):Promise<void>;
+
 export function CreateProject(arg1:main.NewProjectOptions):Promise<void>;
+
+export function CreateTable(arg1:string,arg2:string,arg3:{[key: string]: string}):Promise<void>;
 
 export function DeletePlanet(arg1:string,arg2:string):Promise<void>;
 
 export function DeleteProject(arg1:string):Promise<void>;
+
+export function DisconnectDB():Promise<void>;
+
+export function DropTable(arg1:string,arg2:string):Promise<void>;
+
+export function ExecuteSQLQuery(arg1:string,arg2:string):Promise<Array<{[key: string]: any}>>;
 
 export function GenerateCode(arg1:string):Promise<void>;
 
 export function GetActivePlanets(arg1:string):Promise<Array<main.ClientApp>>;
 
 export function GetApex(arg1:string):Promise<main.ApexData>;
+
+export function GetDSN(arg1:string):Promise<string>;
 
 export function GetDevServersStatus(arg1:string):Promise<main.DevServerStatus>;
 
@@ -23,6 +35,10 @@ export function GetPort(arg1:string):Promise<string>;
 export function GetProjects():Promise<Array<main.ProjectInfo>>;
 
 export function GetServerStatus(arg1:string):Promise<main.ServerStatus>;
+
+export function GetTableSchema(arg1:string,arg2:string):Promise<{[key: string]: string}>;
+
+export function GetTables(arg1:string):Promise<Array<string>>;
 
 export function OpenPlanetInVSCode(arg1:string,arg2:string):Promise<void>;
 
