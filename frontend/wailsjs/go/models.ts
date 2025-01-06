@@ -1,6 +1,7 @@
 export namespace main {
 	
 	export class Operation {
+	    name: string;
 	    endpoint: string;
 	    method: string;
 	    querySchema?: string;
@@ -13,6 +14,7 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
 	        this.endpoint = source["endpoint"];
 	        this.method = source["method"];
 	        this.querySchema = source["querySchema"];
@@ -24,6 +26,7 @@ export namespace main {
 	    name: string;
 	    type: string;
 	    fields: number[];
+	    required?: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new Schema(source);
@@ -34,6 +37,7 @@ export namespace main {
 	        this.name = source["name"];
 	        this.type = source["type"];
 	        this.fields = source["fields"];
+	        this.required = source["required"];
 	    }
 	}
 	export class Endpoint {

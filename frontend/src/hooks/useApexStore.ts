@@ -12,10 +12,8 @@ export const EndpointSchema = z.object({
 
 // ✅ Base Field Schema (Handles Primitive Types & Objects)
 const BaseFieldSchema = z.union([
-  z.string(), // Basic Type (e.g., "string", "number", "boolean")
-  z.object({ type: z.string(), required: z.boolean().optional() }), // Object field
-  z.array(z.string()), // Array of basic types
-  z.array(z.object({ type: z.string(), required: z.boolean().optional() })), // Array of objects
+  z.string(), // Basic Type (e.g., "string", "number", "boolean", "array")
+  z.object({ type: z.literal('array'), arrayType: z.string() }), // Object field
 ])
 
 // ✅ Query Schema (Only Key-Value Pairs, No Nesting)
@@ -23,6 +21,7 @@ export const QuerySchema = z.object({
   name: z.string(),
   type: z.literal('Query'),
   fields: z.record(z.string()), // Only simple key-value pairs (no nesting)
+  required: z.array(z.string()).default([]), // Optional field
 })
 
 // ✅ Body Schema (Nested Fields Allowed)
@@ -30,6 +29,7 @@ export const BodySchema = z.object({
   name: z.string(),
   type: z.literal('Body'), // Unique discriminator value
   fields: z.record(BaseFieldSchema).default({}), // Supports nested fields, allows empty fields
+  required: z.array(z.string()).default([]), // Optional field
 })
 
 // ✅ Response Schema (Nested Fields Allowed)
@@ -37,6 +37,7 @@ export const ResponseSchema = z.object({
   name: z.string(),
   type: z.literal('Response'), // Unique discriminator value
   fields: z.record(BaseFieldSchema).default({}), // Supports nested fields, allows empty fields
+  required: z.array(z.string()).default([]), // Optional field
 })
 
 // ✅ Custom Schema (Recursive Type, Can Reference Other Schemas)
@@ -44,16 +45,21 @@ export const CustomSchema = z.object({
   name: z.string(),
   type: z.literal('Custom'),
   fields: z.record(z.union([BaseFieldSchema, z.string()])), // Allows using another schema as a field
+  required: z.array(z.string()).default([]), // Optional field
 })
 
 // ✅ General Schema (Combines All Types)
 export const SchemaSchema = z.discriminatedUnion('type', [QuerySchema, BodySchema, ResponseSchema, CustomSchema])
 
+export const MethodEnumSchema = z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
+export type MethodEnumType = z.infer<typeof MethodEnumSchema>
+
 // ✅ Operation Schema
 export const OperationSchema = z
   .object({
+    name: z.string(),
     endpoint: z.string(),
-    method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']), // Ensure valid HTTP methods
+    method: MethodEnumSchema, // Ensure valid HTTP methods
     querySchema: z.string().optional(),
     bodySchema: z.string().optional(),
     responseSchema: z.string(), // Required field
@@ -95,6 +101,7 @@ export type QuerySchemaType = z.infer<typeof QuerySchema>
 export type BodySchemaType = z.infer<typeof BodySchema>
 export type ResponseSchemaType = z.infer<typeof ResponseSchema>
 export type CustomSchemaType = z.infer<typeof CustomSchema>
+export type SchemaTypeTypes = QuerySchemaType | BodySchemaType | ResponseSchemaType | CustomSchemaType
 export type SchemaType = z.infer<typeof SchemaSchema>
 export type OperationType = z.infer<typeof OperationSchema>
 export type ApexDataType = z.infer<typeof ApexSchema>
@@ -179,7 +186,7 @@ export const useApexStore = create<ApexStore>()((set, get) => ({
   updateOperation: (name, updated) =>
     set((state) => {
       const operations = [...state.apex.operations]
-      const index = operations.findIndex((e) => e.endpoint === name)
+      const index = operations.findIndex((e) => e.name === name)
       if (index === -1) return state
       operations[index] = updated
       return { apex: { ...state.apex, operations } }
@@ -187,7 +194,7 @@ export const useApexStore = create<ApexStore>()((set, get) => ({
   deleteOperation: (name) =>
     set((state) => {
       const operations = [...state.apex.operations]
-      const index = operations.findIndex((e) => e.endpoint === name)
+      const index = operations.findIndex((e) => e.name === name)
       if (index === -1) return state
       operations.splice(index, 1)
       return { apex: { ...state.apex, operations } }

@@ -23,13 +23,15 @@ type Endpoint struct {
 
 // Schema represents an object with fields, supporting nested objects and arrays
 type Schema struct {
-	Name   string          `json:"name"`
-	Type   string          `json:"type"`
-	Fields json.RawMessage `json:"fields"` // Raw JSON to support nested structures
+	Name     string          `json:"name"`
+	Type     string          `json:"type"`
+	Fields   json.RawMessage `json:"fields"` // Raw JSON to support nested structures
+	Required []string        `json:"required,omitempty"`
 }
 
 // Operation links an endpoint with schemas for queries, bodies, and responses
 type Operation struct {
+	Name           string `json:"name"`
 	Endpoint       string `json:"endpoint"`
 	Method         string `json:"method"`
 	QuerySchema    string `json:"querySchema,omitempty"`
