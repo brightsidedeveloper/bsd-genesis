@@ -601,19 +601,25 @@ func (h *Handler) %s(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		// Response Handling
+		if op.BodySchema != "" {
+			handlerFunc += fmt.Sprintf("\n  var body api.%s\n", op.BodySchema)
+			handlerFunc += "  if err := json.NewDecoder(r.Body).Decode(&body); err != nil {\n"
+			handlerFunc += "    http.Error(w, \"Invalid request body\", http.StatusBadRequest)\n"
+			handlerFunc += "    return\n"
+			handlerFunc += "  }\n"
+		}
+
+		// Response Handling (Now Fully Recursive)
 		responseSchema := op.ResponseSchema
 		if responseSchema == "" {
 			responseSchema = "interface{}" // Fallback if no response schema exists
 		}
 
-		handlerFunc += fmt.Sprintf(`
-  // TODO: Implement Query Logic
+		handlerFunc += "\n  // TODO: Implement Query Logic\n"
 
-  response := api.%s{}
-  h.JSON.Success(w, response)
-}
-`, responseSchema)
+		responseInit, responseVar := generateRecursiveResponse(responseSchema, apex.Schemas)
+		handlerFunc += responseInit + "\n"
+		handlerFunc += fmt.Sprintf("  h.JSON.Success(w, %s)\n}\n", responseVar)
 
 		// Store function in appropriate group
 		handlerGroups[groupName] = append(handlerGroups[groupName], handlerFunc)
@@ -636,6 +642,129 @@ func (h *Handler) %s(w http.ResponseWriter, r *http.Request) {
 	}
 
 	return nil
+}
+
+func generateRecursiveResponse(schemaName string, schemas []Schema) (string, string) {
+	processed := make(map[string]string) // Track initialized structs
+	initCode, structVar := recursiveGoStructInit(schemaName, schemas, processed)
+	return initCode, structVar
+}
+
+func resolveGoType(value json.RawMessage, schemas []Schema) string {
+	// Try to unmarshal into a string (primitive or custom type)
+	var typeString string
+	if err := json.Unmarshal(value, &typeString); err == nil {
+		// If it's a known primitive, return it directly
+		if isPrimitive(typeString) {
+			return typeString
+		}
+
+		// Otherwise, assume it's a **custom struct reference**
+		return typeString
+	}
+
+	// Try to unmarshal into an array definition
+	var arrayDef struct {
+		Type      string `json:"type"`
+		ArrayType string `json:"arrayType"`
+	}
+	if err := json.Unmarshal(value, &arrayDef); err == nil && arrayDef.Type == "array" {
+		// Resolve the inner type and return it as an array
+		return "[]" + resolveGoType(json.RawMessage(`"`+arrayDef.ArrayType+`"`), schemas)
+	}
+
+	// Fallback if nothing matches
+	return "interface{}"
+}
+
+func recursiveGoStructInit(schemaName string, schemas []Schema, processed map[string]string) (string, string) {
+	if schemaName == "" || processed[schemaName] != "" {
+		return "", "" // Prevent duplicates or missing schema
+	}
+
+	// Find the schema
+	var schema *Schema
+	for _, s := range schemas {
+		if s.Name == schemaName {
+			schema = &s
+			break
+		}
+	}
+	if schema == nil {
+		return "", "" // Schema not found
+	}
+
+	// Store the processed schema to prevent duplicate initialization
+	processed[schemaName] = schemaName
+
+	// Initialize the struct instance
+	structVarName := decapitalize(schemaName) // Example: `VResponse` -> `vResponse`
+	initCode := ""
+
+	// Prepare struct initialization
+	initCode += fmt.Sprintf("%s := api.%s{\n", structVarName, schemaName)
+
+	// Unmarshal fields
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(schema.Fields, &fields); err != nil {
+		return "", "" // Handle parsing errors
+	}
+
+	// Store initialization for nested structs
+	nestedInits := ""
+
+	for fieldName, fieldType := range fields {
+		// Determine if it's a primitive or a custom type
+		resolvedType := resolveGoType(fieldType, schemas)
+
+		if isPrimitive(resolvedType) {
+			// Directly assign default values for primitives
+			initCode += fmt.Sprintf("  %s: %s,\n", capitalize(fieldName), defaultGoValue(resolvedType))
+		} else if strings.HasPrefix(resolvedType, "[]") {
+			// It's an **array of custom structs**, initialize it properly
+			innerType := strings.TrimPrefix(resolvedType, "[]")
+			nestedInit, nestedVar := recursiveGoStructInit(innerType, schemas, processed)
+			nestedInits += nestedInit
+			initCode += fmt.Sprintf("  %s: []api.%s{%s},\n", capitalize(fieldName), innerType, nestedVar)
+		} else {
+			// It's a **custom struct**, initialize it recursively
+			nestedInit, nestedVar := recursiveGoStructInit(resolvedType, schemas, processed)
+			nestedInits += nestedInit
+			initCode += fmt.Sprintf("  %s: %s,\n", capitalize(fieldName), nestedVar)
+		}
+	}
+
+	initCode += "}\n" // Close struct initialization
+	return nestedInits + initCode, structVarName
+}
+
+func isPrimitive(fieldType string) bool {
+	switch fieldType {
+	case "string", "number", "boolean":
+		return true
+	default:
+		return false
+	}
+}
+
+func decapitalize(str string) string {
+	if str == "" {
+		return ""
+	}
+	return strings.ToLower(str[:1]) + str[1:]
+}
+
+func defaultGoValue(fieldType string) string {
+	switch fieldType {
+	case "string":
+		return "\"\"" // Default empty string
+	case "number":
+		return "0.0" // Default float64 value
+	case "boolean":
+		return "false" // Default boolean value
+	default:
+		return "nil" // Default for unknown types
+	}
 }
 
 func folderExists(path string) bool {
