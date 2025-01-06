@@ -299,34 +299,53 @@ function ViewOperation({ operationName }: { operationName: string }) {
 
 function SchemaDisplay({ schemaName }: { schemaName: string }) {
   const { apex } = useApexStore()
+  const processedSchemas = new Set<string>() // Track processed schemas to prevent duplicates
+
   const schemas = useMemo(() => {
     const main = apex.schemas.find(({ name }) => name === schemaName)
     if (!main) return []
-    const customSchemas = []
-    const values = Object.values(main.fields)
-    for (const value of values) {
-      if (typeof value === 'string' && apex.schemas.find(({ name }) => name === value)) {
-        customSchemas.push(value)
-      } else if (typeof value === 'object' && value.type === 'array' && apex.schemas.find(({ name }) => name === value.arrayType)) {
-        customSchemas.push(value.arrayType)
-      }
-    }
-    return [main.name, ...customSchemas]
+    return collectSchemasRecursively(main, apex.schemas, processedSchemas)
   }, [apex.schemas, schemaName])
 
   if (!schemas.length) return <p className="text-red-500">Schema "{schemaName}" not found.</p>
-  console.log(schemas)
+
   return (
     <div className="border p-4 bg-card rounded-md font-mono text-sm">
-      <pre>{schemas.map((s) => formatSchema(apex.schemas.find(({ name }) => name === s) as SchemaType, apex.schemas)).join('\n')}</pre>
+      <pre>{schemas.map((s) => formatSchema(s, apex.schemas)).join('\n')}</pre>
     </div>
   )
 }
 
+// ✅ Collect schemas recursively to ensure nested structures are included
+function collectSchemasRecursively(schema: SchemaType, allSchemas: SchemaType[], processedSchemas: Set<string>): SchemaType[] {
+  if (processedSchemas.has(schema.name)) return [] // Prevent duplicates
+  processedSchemas.add(schema.name)
+
+  const collectedSchemas = [schema] // Start with the main schema
+
+  for (const value of Object.values(schema.fields)) {
+    let referencedSchemaName: string | null = null
+
+    if (typeof value === 'string' && allSchemas.find(({ name }) => name === value)) {
+      referencedSchemaName = value
+    } else if (typeof value === 'object' && value.type === 'array') {
+      referencedSchemaName = value.arrayType
+    }
+
+    if (referencedSchemaName) {
+      const referencedSchema = allSchemas.find(({ name }) => name === referencedSchemaName)
+      if (referencedSchema) {
+        collectedSchemas.push(...collectSchemasRecursively(referencedSchema, allSchemas, processedSchemas))
+      }
+    }
+  }
+
+  return collectedSchemas
+}
+
+// ✅ Format schema to TypeScript type declarations
 function formatSchema(schema: SchemaType, allSchemas: SchemaType[], depth = 0): string {
   if (!schema.fields) return ''
-
-  const customSchemas = []
 
   const indent = '  '.repeat(depth)
   let result = `${indent}type ${schema.name} = {\n`
@@ -334,25 +353,14 @@ function formatSchema(schema: SchemaType, allSchemas: SchemaType[], depth = 0): 
   for (const [key, value] of Object.entries(schema.fields)) {
     const fieldType = resolveType(value, allSchemas, depth + 1)
     const isRequired = schema.required?.includes(key)
-
-    if (['string', 'number', 'boolean', 'array'].includes(fieldType)) customSchemas.push(fieldType)
-
-    result += `${indent}  ${key}${isRequired ? '' : '?'}: ${fieldType}\n`
+    result += `${indent}  ${key}${isRequired ? '' : '?'}: ${fieldType};\n`
   }
 
   result += `${indent}}\n`
-
-  for (const customSchema of customSchemas) {
-    if (customSchema === 'array') continue
-    const referencedSchema = allSchemas.find(({ name }) => name === customSchema)
-    if (referencedSchema) {
-      result += formatSchema(referencedSchema, allSchemas, depth + 1)
-    }
-  }
-
   return result
 }
 
+// ✅ Recursively resolve field types
 function resolveType(
   value:
     | string
@@ -365,19 +373,19 @@ function resolveType(
 ): string {
   // Handle primitives
   if (typeof value === 'string' && ['string', 'number', 'boolean'].includes(value)) {
-    return value // Direct primitive types
+    return value
   }
 
-  // Handle arrays
+  // Handle arrays (including custom types)
   if (typeof value === 'object' && value.type === 'array') {
     return `${resolveType(value.arrayType, allSchemas, depth)}[]`
   }
 
-  // Handle custom schema references
+  // Handle custom schema references (recursively expand)
   if (typeof value === 'string') {
     const referencedSchema = allSchemas.find(({ name }) => name === value)
     if (referencedSchema) {
-      return referencedSchema.name // Reference another schema
+      return referencedSchema.name // Correctly reference schema name
     }
   }
 
@@ -386,26 +394,18 @@ function resolveType(
 
 function GoSchemaDisplay({ schemaName }: { schemaName: string }) {
   const { apex } = useApexStore()
+  const processedSchemas = useRef(new Set<string>()) // Prevent duplicate processing
 
   const schemas = useMemo(() => {
+    processedSchemas.current = new Set<string>() // Reset processed schemas
     const main = apex.schemas.find(({ name }) => name === schemaName)
     if (!main) return []
-    const customSchemas = new Set<string>()
-    const values = Object.values(main.fields)
-
-    for (const value of values) {
-      if (typeof value === 'string' && apex.schemas.find(({ name }) => name === value)) {
-        customSchemas.add(value)
-      } else if (typeof value === 'object' && value.type === 'array' && apex.schemas.find(({ name }) => name === value.arrayType)) {
-        customSchemas.add(value.arrayType)
-      }
-    }
-    return [main.name, ...customSchemas]
-  }, [apex.schemas, schemaName])
+    const schemas = collectGoSchemasRecursively(main, apex.schemas, processedSchemas.current).map(({ name }) => name)
+    return Array.from((processedSchemas.current = new Set(schemas)))
+  }, [apex.schemas, processedSchemas, schemaName])
 
   if (!schemas.length) return <p className="text-red-500">Schema "{schemaName}" not found.</p>
 
-  console.log(schemas)
   return (
     <div className="border p-4 bg-card rounded-md font-mono text-sm">
       <pre>{schemas.map((s) => formatGoSchema(apex.schemas.find(({ name }) => name === s) as SchemaType, apex.schemas)).join('\n')}</pre>
@@ -413,55 +413,71 @@ function GoSchemaDisplay({ schemaName }: { schemaName: string }) {
   )
 }
 
-function formatGoSchema(schema: SchemaType, allSchemas: SchemaType[], depth = 0): string {
+// ✅ Recursively collect schemas, ensuring nested structures are included
+function collectGoSchemasRecursively(schema: SchemaType, allSchemas: SchemaType[], processedSchemas: Set<string>): SchemaType[] {
+  if (processedSchemas.has(schema.name)) return [] // Prevent duplicates
+  processedSchemas.add(schema.name)
+
+  const collectedSchemas = [schema] // Start with the main schema
+
+  for (const value of Object.values(schema.fields)) {
+    let referencedSchemaName: string | null = null
+
+    if (typeof value === 'string' && allSchemas.find(({ name }) => name === value)) {
+      referencedSchemaName = value
+    } else if (typeof value === 'object' && value.type === 'array') {
+      referencedSchemaName = value.arrayType
+    }
+
+    if (referencedSchemaName) {
+      const referencedSchema = allSchemas.find(({ name }) => name === referencedSchemaName)
+      if (referencedSchema) {
+        collectedSchemas.push(...collectGoSchemasRecursively(referencedSchema, allSchemas, processedSchemas))
+      }
+    }
+  }
+
+  return collectedSchemas
+}
+
+// ✅ Format schema as Go struct definitions
+function formatGoSchema(schema: SchemaType, allSchemas: SchemaType[], processedSchemas = new Set<string>()): string {
   if (!schema.fields) return ''
 
-  const customSchemas: string[] = []
-  const indent = '\t'.repeat(depth)
-  let result = `${indent}type ${schema.name} struct {\n`
+  // Prevent duplicate struct generation
+  if (processedSchemas.has(schema.name)) return ''
+  processedSchemas.add(schema.name)
+
+  let result = `type ${schema.name} struct {\n`
 
   for (const [key, value] of Object.entries(schema.fields)) {
-    const fieldType = resolveGoType(value, allSchemas, depth + 1)
+    const fieldType = resolveGoType(value, allSchemas)
 
-    if (!['string', 'int', 'float64', 'bool', '[]'].includes(fieldType)) {
-      customSchemas.push(fieldType)
-    }
-
-    result += `${indent}\t${capitalizeGo(key)} ${fieldType} \`json:"${key}"\`\n`
+    result += `\t${capitalizeGo(key)} ${fieldType} \`json:"${key}"\`\n`
   }
 
-  result += `${indent}}\n\n`
-
-  for (const customSchema of customSchemas) {
-    if (customSchema === '[]') continue
-    const referencedSchema = allSchemas.find(({ name }) => name === customSchema)
-    if (referencedSchema) {
-      result += formatGoSchema(referencedSchema, allSchemas, depth + 1)
-    }
-  }
+  result += `}\n\n`
 
   return result
 }
 
-function resolveGoType(value: string | { type: 'array'; arrayType: string }, allSchemas: SchemaType[], depth: number): string {
-  // Handle primitive types
+// ✅ Recursively resolve Go types (primitives, arrays, custom types)
+function resolveGoType(value: string | { type: 'array'; arrayType: string }, allSchemas: SchemaType[]): string {
   if (typeof value === 'string') {
     switch (value) {
       case 'string':
         return 'string'
       case 'number':
-        return 'float64' // Use float64 instead of number
+        return 'float64'
       case 'boolean':
         return 'bool'
       default:
-        // Assume it's a reference to another schema
-        return value
+        return value // Custom type
     }
   }
 
-  // Handle arrays
   if (typeof value === 'object' && value.type === 'array') {
-    return `[]${resolveGoType(value.arrayType, allSchemas, depth)}`
+    return `[]${resolveGoType(value.arrayType, allSchemas)}`
   }
 
   return 'interface{}' // Fallback for unknown types
