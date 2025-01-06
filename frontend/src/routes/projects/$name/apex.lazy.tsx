@@ -19,6 +19,7 @@ import Go from '@/Go'
 import { EndpointSchema, MethodEnumType, OperationSchema, SchemaType, useApexStore } from '@/hooks/useApexStore'
 import useDirAndName from '@/hooks/useDirAndName'
 import { cn } from '@/lib/utils'
+import { GetServerStatusSchema } from '@/types/schemas'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import isEqual from 'lodash.isequal'
 import { Check, ChevronsUpDown } from 'lucide-react'
@@ -69,11 +70,26 @@ function RouteComponent() {
                 .generate(dir)
                 .then(() => {
                   toast.success('Code generated.')
+                  Go.server
+                    .status(dir)
+                    .then((status) => GetServerStatusSchema.parse(status))
+                    .then((status) => {
+                      if (status.server === 'running') {
+                        Go.server.restartServer(dir).then(() => {
+                          toast.success('Server restarted.')
+                          setGenerating(false)
+                        })
+                      } else {
+                        setGenerating(false)
+                      }
+                    })
+                    .catch(() => {
+                      toast.error('Failed to restart server.')
+                      setGenerating(false)
+                    })
                 })
                 .catch(() => {
                   toast.error('Failed to generate code.')
-                })
-                .finally(() => {
                   setGenerating(false)
                 })
             }}
@@ -223,6 +239,7 @@ function ViewOperation({ operationName }: { operationName: string }) {
           {request && (
             <div className="flex flex-col gap-2">
               <SchemaDisplay schemaName={request} />
+              <GoSchemaDisplay schemaName={request} />
             </div>
           )}
         </div>
@@ -265,6 +282,7 @@ function ViewOperation({ operationName }: { operationName: string }) {
             </PopoverContent>
           </Popover>
           <SchemaDisplay schemaName={response} />
+          <GoSchemaDisplay schemaName={response} />
         </div>
         <div className="flex gap-4 justify-end">
           <Button disabled={!isDirty} variant="secondary" onClick={reset}>
@@ -311,7 +329,7 @@ function formatSchema(schema: SchemaType, allSchemas: SchemaType[], depth = 0): 
   const customSchemas = []
 
   const indent = '  '.repeat(depth)
-  let result = `${indent}interface ${schema.name} {\n`
+  let result = `${indent}type ${schema.name} = {\n`
 
   for (const [key, value] of Object.entries(schema.fields)) {
     const fieldType = resolveType(value, allSchemas, depth + 1)
@@ -364,6 +382,93 @@ function resolveType(
   }
 
   return 'unknown' // Fallback for unsupported types
+}
+
+function GoSchemaDisplay({ schemaName }: { schemaName: string }) {
+  const { apex } = useApexStore()
+
+  const schemas = useMemo(() => {
+    const main = apex.schemas.find(({ name }) => name === schemaName)
+    if (!main) return []
+    const customSchemas = new Set<string>()
+    const values = Object.values(main.fields)
+
+    for (const value of values) {
+      if (typeof value === 'string' && apex.schemas.find(({ name }) => name === value)) {
+        customSchemas.add(value)
+      } else if (typeof value === 'object' && value.type === 'array' && apex.schemas.find(({ name }) => name === value.arrayType)) {
+        customSchemas.add(value.arrayType)
+      }
+    }
+    return [main.name, ...customSchemas]
+  }, [apex.schemas, schemaName])
+
+  if (!schemas.length) return <p className="text-red-500">Schema "{schemaName}" not found.</p>
+
+  console.log(schemas)
+  return (
+    <div className="border p-4 bg-card rounded-md font-mono text-sm">
+      <pre>{schemas.map((s) => formatGoSchema(apex.schemas.find(({ name }) => name === s) as SchemaType, apex.schemas)).join('\n')}</pre>
+    </div>
+  )
+}
+
+function formatGoSchema(schema: SchemaType, allSchemas: SchemaType[], depth = 0): string {
+  if (!schema.fields) return ''
+
+  const customSchemas: string[] = []
+  const indent = '\t'.repeat(depth)
+  let result = `${indent}type ${schema.name} struct {\n`
+
+  for (const [key, value] of Object.entries(schema.fields)) {
+    const fieldType = resolveGoType(value, allSchemas, depth + 1)
+
+    if (!['string', 'int', 'float64', 'bool', '[]'].includes(fieldType)) {
+      customSchemas.push(fieldType)
+    }
+
+    result += `${indent}\t${capitalizeGo(key)} ${fieldType} \`json:"${key}"\`\n`
+  }
+
+  result += `${indent}}\n\n`
+
+  for (const customSchema of customSchemas) {
+    if (customSchema === '[]') continue
+    const referencedSchema = allSchemas.find(({ name }) => name === customSchema)
+    if (referencedSchema) {
+      result += formatGoSchema(referencedSchema, allSchemas, depth + 1)
+    }
+  }
+
+  return result
+}
+
+function resolveGoType(value: string | { type: 'array'; arrayType: string }, allSchemas: SchemaType[], depth: number): string {
+  // Handle primitive types
+  if (typeof value === 'string') {
+    switch (value) {
+      case 'string':
+        return 'string'
+      case 'number':
+        return 'float64' // Use float64 instead of number
+      case 'boolean':
+        return 'bool'
+      default:
+        // Assume it's a reference to another schema
+        return value
+    }
+  }
+
+  // Handle arrays
+  if (typeof value === 'object' && value.type === 'array') {
+    return `[]${resolveGoType(value.arrayType, allSchemas, depth)}`
+  }
+
+  return 'interface{}' // Fallback for unknown types
+}
+
+function capitalizeGo(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 function CreateOperationDialog() {

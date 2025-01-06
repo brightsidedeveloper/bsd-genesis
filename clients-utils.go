@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os/exec"
+	"regexp"
+	"runtime"
 	"strings"
 )
 
@@ -22,4 +24,31 @@ func isDevServerRunning(planetPath string) bool {
 		}
 	}
 	return false
+}
+
+// ✅ Function to extract the local URL from logs
+func extractLocalURL(logs string) string {
+	// Regex to match lines like "➜  Local:   http://localhost:5174/"
+	re := regexp.MustCompile(`Local:\s+(http://localhost:\d+/?)`)
+	matches := re.FindStringSubmatch(logs)
+	if len(matches) > 1 {
+		return matches[1] // ✅ Extracted URL
+	}
+	return "" // Default fallback if not found
+}
+
+// ✅ Function to open the browser
+func openBrowser(url string) error {
+	cmd := exec.Command("")
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "windows":
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+	case "linux":
+		cmd = exec.Command("xdg-open", url)
+	default:
+		return fmt.Errorf("unsupported platform")
+	}
+	return cmd.Start()
 }

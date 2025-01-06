@@ -38,9 +38,24 @@ function RouteComponent() {
 
   const [search, setSearch] = useState('')
 
+  const [tab, setTab] = useState<'All' | 'Query' | 'Body' | 'Response' | 'Custom'>('All')
+
   const filteredSchemas = useMemo(() => {
-    return apex.schemas.filter(({ name }) => search === '' || name.toLowerCase().includes(search.toLowerCase()))
-  }, [apex.schemas, search])
+    return apex.schemas
+      .filter(({ name, type }) => (tab === 'All' || type === tab) && (search === '' || name.toLowerCase().includes(search.toLowerCase())))
+      .sort((a, b) => {
+        // Sort by type priority first
+        const typeOrderA = schemaTypeOrder[a.type] || 99 // Default large number if missing
+        const typeOrderB = schemaTypeOrder[b.type] || 99
+
+        if (typeOrderA !== typeOrderB) {
+          return typeOrderA - typeOrderB
+        }
+
+        // If types are the same, sort alphabetically by name
+        return a.name.localeCompare(b.name)
+      })
+  }, [apex.schemas, search, tab])
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,20 +95,43 @@ function RouteComponent() {
           </div>
           <Input className="mb-2" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
           <div className="flex flex-col gap-2">
-            {filteredSchemas.map(({ name }) => (
-              <button
-                key={name}
-                onClick={() => setSchema((c) => (c === name ? '' : name))}
-                className={cn(name === schema && 'bg-primary/15', 'hover:bg-primary/10 rounded-lg p-2')}
-              >
-                {name}
-              </button>
-            ))}
+            <Select value={tab} onValueChange={(t: SchemaTypeUnion | 'All') => setTab(t)}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="All">All</SelectItem>
+                  <SelectItem value="Query">Query</SelectItem>
+                  <SelectItem value="Body">Body</SelectItem>
+                  <SelectItem value="Response">Response</SelectItem>
+                  <SelectItem value="Custom">Custom</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {filteredSchemas.map(({ name }) => {
+              return (
+                <button
+                  key={name}
+                  onClick={() => setSchema((c) => (c === name ? '' : name))}
+                  className={cn(name === schema && 'bg-primary/15', 'hover:bg-primary/10 rounded-lg p-2')}
+                >
+                  {name}
+                </button>
+              )
+            })}
           </div>
         </ScrollArea>
       </div>
     </div>
   )
+}
+
+const schemaTypeOrder: Record<string, number> = {
+  Query: 1,
+  Body: 2,
+  Response: 3,
+  Custom: 4,
 }
 
 function CreateSchemaDialog() {

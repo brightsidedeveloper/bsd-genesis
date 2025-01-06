@@ -279,6 +279,9 @@ func (a *App) StartDevServer(dir, planetType string) (string, error) {
 	fmt.Println("⏳ Waiting", waitTime, "for logs before returning...")
 	time.Sleep(waitTime)
 
+	url := extractLocalURL(output) // ✅ Extract local URL from logs
+	openBrowser(url)
+
 	return output, nil
 }
 

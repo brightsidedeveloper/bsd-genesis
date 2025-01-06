@@ -111,7 +111,7 @@ function RouteComponent() {
       <div className="flex space-x-4">
         <Button
           disabled={starting || stopping}
-          className={cn(status?.server === 'stopped' && 'bg-green-500 text-primary hover:bg-green-600')}
+          className={cn((status?.server === 'stopped' || status?.db === 'stopped') && 'bg-green-500 text-primary hover:bg-green-600')}
           variant="secondary"
           onClick={() => {
             if (status?.server === 'running') {
@@ -151,7 +151,7 @@ function RouteComponent() {
           {status?.server === 'running' ? 'Restart Server' : 'Start Server'}
         </Button>
         <Button
-          disabled={status?.server === 'stopped' || starting || stopping}
+          disabled={status?.server === 'stopped' || status?.db === 'stopped' || starting || stopping}
           variant="destructive"
           onClick={() => {
             setStopping(true)
