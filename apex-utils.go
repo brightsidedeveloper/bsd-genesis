@@ -638,15 +638,6 @@ func (h *Handler) %s(w http.ResponseWriter, r *http.Request) {
 	return nil
 }
 
-// fileExists checks if a file exists at the given path.
-func fileExists(path string) bool {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
 func folderExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
