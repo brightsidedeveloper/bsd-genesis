@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -335,7 +336,7 @@ func generateTSAPIClient(apex *ApexData, projectDir, subDir, port string) error 
 	}
 
 	// ✅ Copy `request.ts` and update BASE_URL
-	err = copyAndModifyRequestFile(filepath.Join(tsDir, "request.ts"), baseURL)
+	err = updateBaseURL(filepath.Join(tsDir, "request.ts"), baseURL)
 	if err != nil {
 		fmt.Println("❌ Failed to copy and update request.ts:", err)
 	} else {
@@ -345,26 +346,29 @@ func generateTSAPIClient(apex *ApexData, projectDir, subDir, port string) error 
 	return err
 }
 
-func copyAndModifyRequestFile(destPath string, baseURL string) error {
-	// Read the original request.ts file from embedded source or predefined location
-	originalFilePath := destPath // Change this to the correct template path
-	input, err := os.ReadFile(originalFilePath)
+func updateBaseURL(filePath, baseURL string) error {
+	// Read the existing file content
+	input, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("failed to read request.ts template: %w", err)
+		return fmt.Errorf("failed to read file: %w", err)
 	}
 
-	// Replace BASE_URL with actual port-based URL
-	updatedContent := strings.ReplaceAll(string(input), "const BASE_URL = ''", fmt.Sprintf("const BASE_URL = '%s'", baseURL))
+	// Define regex pattern to match BASE_URL assignment
+	re := regexp.MustCompile(`const BASE_URL\s*=\s*['"].*?['"]`)
 
-	// Ensure the directory exists
-	ensureDir(filepath.Dir(destPath))
+	// Generate the new BASE_URL assignment
+	newBaseURL := fmt.Sprintf(`const BASE_URL = '%s'`, baseURL)
 
-	// Write the modified file
-	err = os.WriteFile(destPath, []byte(updatedContent), 0644)
+	// Replace any existing BASE_URL assignment
+	updatedContent := re.ReplaceAllString(string(input), newBaseURL)
+
+	// Write the updated content back to the file
+	err = os.WriteFile(filePath, []byte(updatedContent), 0644)
 	if err != nil {
-		return fmt.Errorf("failed to write updated request.ts: %w", err)
+		return fmt.Errorf("failed to write updated file: %w", err)
 	}
 
+	fmt.Println("✅ Successfully updated BASE_URL in:", filePath)
 	return nil
 }
 
