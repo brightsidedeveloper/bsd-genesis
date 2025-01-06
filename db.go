@@ -78,7 +78,8 @@ func (a *App) DisconnectDB() error {
 	defer a.mu.Unlock()
 
 	if a.db == nil {
-		return fmt.Errorf("⚠️ No active database connection to disconnect")
+		fmt.Println("⚠️ No active database connection to disconnect")
+		return nil
 	}
 
 	err := a.db.Close()

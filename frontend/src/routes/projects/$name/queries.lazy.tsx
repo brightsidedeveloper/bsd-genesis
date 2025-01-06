@@ -380,13 +380,13 @@ function SQLEditor() {
           </>
         )}
       </div>
-      <ScrollArea className="w-52 h-[calc(100vh-var(--header-height)-40px-64px)] border-l px-4 flex flex-col gap-2">
+      <ScrollArea className="w-52 h-[calc(100vh-var(--header-height)-40px-64px)] border-l pl-4 flex flex-col gap-2">
         {sortedSqlHistory?.map(({ id, query }) => (
           <TooltipProvider key={id}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button onClick={() => setSql(query)}>
-                  <pre className="text-xs truncate w-40">{query}</pre>
+                <button className={cn('hover:bg-primary/10 w-full rounded-lg p-2 ')} onClick={() => setSql(query)}>
+                  <pre className="text-xs truncate w-44">{query}</pre>
                 </button>
               </TooltipTrigger>
               <TooltipContent>

@@ -1,14 +1,18 @@
 import Go from '@/Go'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import useDirAndName from './useDirAndName'
+import { useAtom } from 'jotai'
+import { connectedAtom, disconnectingRef } from '@/context/dbAtoms'
 
 export default function useDB() {
   const { dir } = useDirAndName()
-  const [connected, setConnected] = useState(false)
+  const [connected, setConnected] = useAtom(connectedAtom)
+  const connectingRef = useRef(false)
 
   useEffect(() => {
-    if (connected) return
+    if (connected || connectingRef.current) return
+    connectingRef.current = true
     Go.db
       .connect(dir)
       .then(() => {
@@ -16,19 +20,26 @@ export default function useDB() {
         setConnected(true)
       })
       .catch(() => toast.error('Failed to connect to database'))
-  }, [connected, dir])
+      .finally(() => {
+        connectingRef.current = false
+      })
+  }, [connected, dir, setConnected])
 
   useEffect(() => {
+    clearTimeout(disconnectingRef.current)
     return () => {
-      Go.db
-        .disconnect()
-        .then(() => {
-          toast.success('Disconnected from database')
-          setConnected(false)
-        })
-        .catch(() => toast.error('Failed to disconnect from database'))
+      disconnectingRef.current = setTimeout(() => {
+        Go.db
+          .disconnect()
+          .then(() => {
+            toast.success('Disconnected from database')
+            setConnected(false)
+            connectingRef.current = false
+          })
+          .catch(() => toast.error('Failed to disconnect from database'))
+      })
     }
-  }, [])
+  }, [setConnected])
 
   return { connected }
 }
