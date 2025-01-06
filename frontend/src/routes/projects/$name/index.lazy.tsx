@@ -7,5 +7,13 @@ export const Route = createLazyFileRoute('/projects/$name/')({
 
 function RouteComponent() {
   const { name } = useDirAndName()
-  return <div>Hello {name}</div>
+  return (
+    <div>
+      Hello {name}
+      <br />
+      <br />
+      <br />
+      Todo: Put Kanban Here
+    </div>
+  )
 }

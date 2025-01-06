@@ -7,6 +7,7 @@ import {
   Braces,
   Database,
   GitGraph,
+  Github,
   Library,
   Package,
   PcCase,
@@ -190,5 +191,6 @@ const routes = [
   { to: '/projects/$name/gomod', label: 'Go Mod', Icon: Library },
   { to: '/projects/$name/tspack', label: 'TS Pack', Icon: Package },
   { to: '/projects/$name/git', label: 'Git', Icon: GitGraph },
+  { to: '/projects/$name/github-actions', label: 'Actions', Icon: Github },
   { to: '/projects/$name/deploy', label: 'Deploy', Icon: Ship },
 ] as const
