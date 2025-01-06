@@ -3,6 +3,7 @@ import {
   CreateProject,
   DeletePlanet,
   DeleteProject,
+  GenerateCode,
   GetActivePlanets,
   GetApex,
   GetDevServersStatus,
@@ -47,5 +48,6 @@ export default class Go {
   static apex = {
     get: GetApex,
     save: SaveApex,
+    generate: GenerateCode,
   }
 }

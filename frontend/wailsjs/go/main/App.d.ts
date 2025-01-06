@@ -10,6 +10,8 @@ export function DeletePlanet(arg1:string,arg2:string):Promise<void>;
 
 export function DeleteProject(arg1:string):Promise<void>;
 
+export function GenerateCode(arg1:string):Promise<void>;
+
 export function GetActivePlanets(arg1:string):Promise<Array<main.ClientApp>>;
 
 export function GetApex(arg1:string):Promise<main.ApexData>;

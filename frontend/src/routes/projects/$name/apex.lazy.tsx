@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import Go from '@/Go'
 import { EndpointSchema, MethodEnumType, OperationSchema, SchemaType, useApexStore } from '@/hooks/useApexStore'
 import useDirAndName from '@/hooks/useDirAndName'
 import { cn } from '@/lib/utils'
@@ -43,6 +44,8 @@ function RouteComponent() {
     [apex.operations, search]
   )
 
+  const [generating, setGenerating] = useState(false)
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -57,7 +60,26 @@ function RouteComponent() {
             </Button>
           </div>
         ) : (
-          <Button size="sm">Generate</Button>
+          <Button
+            size="sm"
+            disabled={generating}
+            onClick={() => {
+              setGenerating(true)
+              Go.apex
+                .generate(dir)
+                .then(() => {
+                  toast.success('Code generated.')
+                })
+                .catch(() => {
+                  toast.error('Failed to generate code.')
+                })
+                .finally(() => {
+                  setGenerating(false)
+                })
+            }}
+          >
+            Generate
+          </Button>
         )}
       </div>
       <hr />

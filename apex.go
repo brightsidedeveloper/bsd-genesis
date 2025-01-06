@@ -67,3 +67,30 @@ func (a *App) SaveApex(dir string, apexData ApexData) error {
 	fmt.Println("✅ Successfully saved apex.json at:", apexFilePath)
 	return nil
 }
+
+func (a *App) GenerateCode(dir string) error {
+	a.mu.Lock()
+	apex, err := a.GetApex(dir)
+	if err != nil {
+		return err
+	}
+
+	projectDir := a.ProjectsDir
+	a.mu.Unlock()
+	port := a.GetPort(dir)
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	// Generate TypeScript for Web, Desktop, and Native
+	for _, platform := range []string{"web", "desktop", "mobile"} {
+		generateTSTypes(apex, projectDir, filepath.Join(dir, "planets", platform))
+		generateTSAPIClient(apex, projectDir, filepath.Join(dir, "planets", platform), port)
+		generateTSQueries(apex, projectDir, filepath.Join(dir, "planets", platform))
+	}
+
+	// Generate Go structs, routes, and handlers
+	generateGoStructs(apex, projectDir, dir)
+	generateGoRoutes(apex, projectDir, dir)
+	generateGoHandlers(apex, projectDir, dir)
+
+	return nil
+}

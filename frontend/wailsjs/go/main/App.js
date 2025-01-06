@@ -18,6 +18,10 @@ export function DeleteProject(arg1) {
   return window['go']['main']['App']['DeleteProject'](arg1);
 }
 
+export function GenerateCode(arg1) {
+  return window['go']['main']['App']['GenerateCode'](arg1);
+}
+
 export function GetActivePlanets(arg1) {
   return window['go']['main']['App']['GetActivePlanets'](arg1);
 }
