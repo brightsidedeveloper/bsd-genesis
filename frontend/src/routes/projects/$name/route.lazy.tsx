@@ -33,7 +33,7 @@ import Go from '@/Go'
 import useDirAndName from '@/hooks/useDirAndName'
 import { toast } from 'sonner'
 import { useApexStore } from '@/hooks/useApexStore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { GetClientDevServersSchema, GetServerStatusSchema } from '@/types/schemas'
 
 export const Route = createLazyFileRoute('/projects/$name')({
@@ -50,39 +50,47 @@ function RouteComponent() {
     loadApex(dir)
   }, [clear, loadApex, dir])
 
+  const [deleting, setDeleting] = useState(false)
+
   async function deleteProject() {
-    await Go.clients
-      .devServers(dir)
-      .then((s) => GetClientDevServersSchema.parse(s))
-      .then((servers) => {
-        const promises = []
-        if (servers.web) promises.push(Go.clients.stopDev(dir, 'web'))
-        if (servers.mobile) promises.push(Go.clients.stopDev(dir, 'mobile'))
-        if (servers.desktop) promises.push(Go.clients.stopDev(dir, 'desktop'))
-        if (promises.length === 0) return
-        return Promise.all(promises)
-          .then(() => {
-            toast('Clients Stopped', { description: 'Clients stopped for ' + name })
-          })
-          .catch(() => {
-            toast('Error', { description: 'Failed to stop clients' })
-          })
-      })
-    await Go.server
-      .status(dir)
-      .then((s) => GetServerStatusSchema.parse(s))
-      .then((status) => {
-        if (status.db === 'running' || status.server === 'running') {
-          return Go.server
-            .stop(dir)
+    setDeleting(true)
+    try {
+      await Go.clients
+        .devServers(dir)
+        .then((s) => GetClientDevServersSchema.parse(s))
+        .then((servers) => {
+          const promises = []
+          if (servers.web) promises.push(Go.clients.stopDev(dir, 'web'))
+          if (servers.mobile) promises.push(Go.clients.stopDev(dir, 'mobile'))
+          if (servers.desktop) promises.push(Go.clients.stopDev(dir, 'desktop'))
+          if (promises.length === 0) return
+          return Promise.all(promises)
             .then(() => {
-              toast('Server Stopped', { description: 'Server stopped for ' + name })
+              toast('Clients Stopped', { description: 'Clients stopped for ' + name })
             })
             .catch(() => {
-              toast('Error', { description: 'Failed to stop server' })
+              toast('Error', { description: 'Failed to stop clients' })
             })
-        }
-      })
+        })
+      await Go.server
+        .status(dir)
+        .then((s) => GetServerStatusSchema.parse(s))
+        .then((status) => {
+          if (status.db === 'running' || status.server === 'running') {
+            return Go.server
+              .stop(dir)
+              .then(() => {
+                toast('Server Stopped', { description: 'Server stopped for ' + name })
+              })
+              .catch(() => {
+                toast('Error', { description: 'Failed to stop server' })
+              })
+          }
+        })
+    } catch (error: unknown) {
+      console.error(error)
+      toast('Error', { description: 'Failed to stop clients/server' })
+    }
 
     Go.projects
       .delete(dir)
@@ -93,6 +101,7 @@ function RouteComponent() {
         })
       })
       .catch(() => toast('Error', { description: 'Failed to delete project' }))
+      .finally(() => setDeleting(false))
   }
 
   return (
@@ -145,9 +154,11 @@ function RouteComponent() {
               <DialogFooter>
                 <div className="flex items-center gap-4 justify-between">
                   <DialogClose asChild>
-                    <Button variant="secondary">Cancel</Button>
+                    <Button disabled={deleting} variant="secondary">
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button variant="destructive" onClick={deleteProject}>
+                  <Button disabled={deleting} variant="destructive" onClick={deleteProject}>
                     Delete
                   </Button>
                 </div>
