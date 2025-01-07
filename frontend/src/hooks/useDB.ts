@@ -19,7 +19,7 @@ export default function useDB() {
         toast.success('Connected to database')
         setConnected(true)
       })
-      .catch(() => toast.error('Failed to connect to database'))
+      .catch(() => toast.error('Failed to connect to database', { description: 'Make sure your Star is running' }))
       .finally(() => {
         connectingRef.current = false
       })
