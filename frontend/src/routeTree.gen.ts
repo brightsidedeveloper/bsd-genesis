@@ -19,6 +19,7 @@ import { Route as ProjectsNameGitImport } from './routes/projects/$name/git'
 
 const LayoutRouteLazyImport = createFileRoute('/_layout')()
 const LayoutIndexLazyImport = createFileRoute('/_layout/')()
+const LayoutWormholesLazyImport = createFileRoute('/_layout/wormholes')()
 const LayoutUniverseLazyImport = createFileRoute('/_layout/universe')()
 const LayoutStarshipsLazyImport = createFileRoute('/_layout/starships')()
 const LayoutSettingsLazyImport = createFileRoute('/_layout/settings')()
@@ -62,6 +63,14 @@ const LayoutIndexLazyRoute = LayoutIndexLazyImport.update({
   path: '/',
   getParentRoute: () => LayoutRouteLazyRoute,
 } as any).lazy(() => import('./routes/_layout/index.lazy').then((d) => d.Route))
+
+const LayoutWormholesLazyRoute = LayoutWormholesLazyImport.update({
+  id: '/wormholes',
+  path: '/wormholes',
+  getParentRoute: () => LayoutRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_layout/wormholes.lazy').then((d) => d.Route),
+)
 
 const LayoutUniverseLazyRoute = LayoutUniverseLazyImport.update({
   id: '/universe',
@@ -285,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutUniverseLazyImport
       parentRoute: typeof LayoutRouteLazyImport
     }
+    '/_layout/wormholes': {
+      id: '/_layout/wormholes'
+      path: '/wormholes'
+      fullPath: '/wormholes'
+      preLoaderRoute: typeof LayoutWormholesLazyImport
+      parentRoute: typeof LayoutRouteLazyImport
+    }
     '/_layout/': {
       id: '/_layout/'
       path: '/'
@@ -408,6 +424,7 @@ interface LayoutRouteLazyRouteChildren {
   LayoutSettingsLazyRoute: typeof LayoutSettingsLazyRoute
   LayoutStarshipsLazyRoute: typeof LayoutStarshipsLazyRoute
   LayoutUniverseLazyRoute: typeof LayoutUniverseLazyRoute
+  LayoutWormholesLazyRoute: typeof LayoutWormholesLazyRoute
   LayoutIndexLazyRoute: typeof LayoutIndexLazyRoute
 }
 
@@ -417,6 +434,7 @@ const LayoutRouteLazyRouteChildren: LayoutRouteLazyRouteChildren = {
   LayoutSettingsLazyRoute: LayoutSettingsLazyRoute,
   LayoutStarshipsLazyRoute: LayoutStarshipsLazyRoute,
   LayoutUniverseLazyRoute: LayoutUniverseLazyRoute,
+  LayoutWormholesLazyRoute: LayoutWormholesLazyRoute,
   LayoutIndexLazyRoute: LayoutIndexLazyRoute,
 }
 
@@ -473,6 +491,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof LayoutSettingsLazyRoute
   '/starships': typeof LayoutStarshipsLazyRoute
   '/universe': typeof LayoutUniverseLazyRoute
+  '/wormholes': typeof LayoutWormholesLazyRoute
   '/': typeof LayoutIndexLazyRoute
   '/projects/$name/git': typeof ProjectsNameGitRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
@@ -497,6 +516,7 @@ export interface FileRoutesByTo {
   '/settings': typeof LayoutSettingsLazyRoute
   '/starships': typeof LayoutStarshipsLazyRoute
   '/universe': typeof LayoutUniverseLazyRoute
+  '/wormholes': typeof LayoutWormholesLazyRoute
   '/': typeof LayoutIndexLazyRoute
   '/projects/$name/git': typeof ProjectsNameGitRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
@@ -524,6 +544,7 @@ export interface FileRoutesById {
   '/_layout/settings': typeof LayoutSettingsLazyRoute
   '/_layout/starships': typeof LayoutStarshipsLazyRoute
   '/_layout/universe': typeof LayoutUniverseLazyRoute
+  '/_layout/wormholes': typeof LayoutWormholesLazyRoute
   '/_layout/': typeof LayoutIndexLazyRoute
   '/projects/$name/git': typeof ProjectsNameGitRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
@@ -552,6 +573,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/starships'
     | '/universe'
+    | '/wormholes'
     | '/'
     | '/projects/$name/git'
     | '/projects/$name/apex'
@@ -575,6 +597,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/starships'
     | '/universe'
+    | '/wormholes'
     | '/'
     | '/projects/$name/git'
     | '/projects/$name/apex'
@@ -600,6 +623,7 @@ export interface FileRouteTypes {
     | '/_layout/settings'
     | '/_layout/starships'
     | '/_layout/universe'
+    | '/_layout/wormholes'
     | '/_layout/'
     | '/projects/$name/git'
     | '/projects/$name/apex'
@@ -651,6 +675,7 @@ export const routeTree = rootRoute
         "/_layout/settings",
         "/_layout/starships",
         "/_layout/universe",
+        "/_layout/wormholes",
         "/_layout/"
       ]
     },
@@ -692,6 +717,10 @@ export const routeTree = rootRoute
     },
     "/_layout/universe": {
       "filePath": "_layout/universe.lazy.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/wormholes": {
+      "filePath": "_layout/wormholes.lazy.tsx",
       "parent": "/_layout"
     },
     "/_layout/": {

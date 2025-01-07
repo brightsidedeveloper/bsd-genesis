@@ -1,6 +1,6 @@
 import { createLazyFileRoute, Link, Outlet, useLocation } from '@tanstack/react-router'
 import logo from '@/assets/images/logo.png'
-import { Orbit, PanelsTopLeft, Rocket, Settings, Shell, Sparkles } from 'lucide-react'
+import { Orbit, PanelsTopLeft, Rocket, Rotate3D, Settings, Shell, Sparkles } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 import { useMemo } from 'react'
 
@@ -60,6 +60,7 @@ const routes = [
   { to: '/', label: 'Overview', Icon: PanelsTopLeft },
   { to: '/universe', label: 'Universe', Icon: Sparkles },
   { to: '/clusters', label: 'Galaxies', Icon: Shell },
+  { to: '/wormholes', label: 'Wormholes', Icon: Rotate3D },
   { to: '/projects-list', label: 'Solar Systems', Icon: Orbit },
   { to: '/starships', label: 'Starship Fleet', Icon: Rocket },
 ] as const
