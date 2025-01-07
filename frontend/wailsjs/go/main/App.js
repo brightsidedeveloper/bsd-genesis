@@ -62,6 +62,10 @@ export function GetDevServersStatus(arg1) {
   return window['go']['main']['App']['GetDevServersStatus'](arg1);
 }
 
+export function GetGitStatus(arg1) {
+  return window['go']['main']['App']['GetGitStatus'](arg1);
+}
+
 export function GetPort(arg1) {
   return window['go']['main']['App']['GetPort'](arg1);
 }
@@ -84,6 +88,14 @@ export function GetTableSchema(arg1, arg2) {
 
 export function GetTables(arg1) {
   return window['go']['main']['App']['GetTables'](arg1);
+}
+
+export function GitCommit(arg1, arg2) {
+  return window['go']['main']['App']['GitCommit'](arg1, arg2);
+}
+
+export function InitGitRepo(arg1) {
+  return window['go']['main']['App']['InitGitRepo'](arg1);
 }
 
 export function OpenPlanetInVSCode(arg1, arg2) {

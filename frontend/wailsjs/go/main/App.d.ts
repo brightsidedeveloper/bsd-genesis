@@ -32,6 +32,8 @@ export function GetDSN(arg1:string):Promise<string>;
 
 export function GetDevServersStatus(arg1:string):Promise<main.DevServerStatus>;
 
+export function GetGitStatus(arg1:string):Promise<string>;
+
 export function GetPort(arg1:string):Promise<string>;
 
 export function GetProjects():Promise<Array<main.ProjectInfo>>;
@@ -43,6 +45,10 @@ export function GetServerStatus(arg1:string):Promise<main.ServerStatus>;
 export function GetTableSchema(arg1:string,arg2:string):Promise<{[key: string]: string}>;
 
 export function GetTables(arg1:string):Promise<Array<string>>;
+
+export function GitCommit(arg1:string,arg2:string):Promise<void>;
+
+export function InitGitRepo(arg1:string):Promise<void>;
 
 export function OpenPlanetInVSCode(arg1:string,arg2:string):Promise<void>;
 

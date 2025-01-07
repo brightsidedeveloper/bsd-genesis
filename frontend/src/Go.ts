@@ -13,12 +13,15 @@ import {
   GetActivePlanets,
   GetApex,
   GetDevServersStatus,
+  GetGitStatus,
   GetPort,
   GetProjects,
   GetServerStatus,
   GetSQLHistory,
   GetTables,
   GetTableSchema,
+  GitCommit,
+  InitGitRepo,
   OpenPlanetInVSCode,
   OpenProjectInVSCode,
   RestartServer,
@@ -75,5 +78,10 @@ export default class Go {
     get: GetSQLHistory,
     save: SaveSQLQuery,
     del: DeleteSQLQuery,
+  }
+  static git = {
+    init: InitGitRepo,
+    status: GetGitStatus,
+    commit: GitCommit,
   }
 }
