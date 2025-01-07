@@ -1,3 +1,4 @@
+import Go from '@/Go'
 import { createLazyFileRoute } from '@tanstack/react-router'
 
 export const Route = createLazyFileRoute('/_layout/')({
@@ -5,5 +6,18 @@ export const Route = createLazyFileRoute('/_layout/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/_layout/"!</div>
+  return (
+    <div>
+      Welcome to Genesis - Creator of Universes
+      <br />
+      <button
+        onClick={() => {
+          Go.app.openBrowser('https://github.com/brightsidedeveloper')
+        }}
+        className="hover:underline text-blue-500"
+      >
+        By BrightSideDeveloper
+      </button>
+    </div>
+  )
 }

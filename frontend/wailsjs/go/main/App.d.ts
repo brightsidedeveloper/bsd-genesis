@@ -50,6 +50,8 @@ export function GitCommit(arg1:string,arg2:string):Promise<void>;
 
 export function InitGitRepo(arg1:string):Promise<void>;
 
+export function OpenBrowser(arg1:string):Promise<void>;
+
 export function OpenPlanetInVSCode(arg1:string,arg2:string):Promise<void>;
 
 export function OpenProjectInVSCode(arg1:string):Promise<void>;

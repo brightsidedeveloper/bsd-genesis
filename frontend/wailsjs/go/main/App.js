@@ -98,6 +98,10 @@ export function InitGitRepo(arg1) {
   return window['go']['main']['App']['InitGitRepo'](arg1);
 }
 
+export function OpenBrowser(arg1) {
+  return window['go']['main']['App']['OpenBrowser'](arg1);
+}
+
 export function OpenPlanetInVSCode(arg1, arg2) {
   return window['go']['main']['App']['OpenPlanetInVSCode'](arg1, arg2);
 }

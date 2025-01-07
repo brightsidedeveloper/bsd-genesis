@@ -22,6 +22,7 @@ import {
   GetTableSchema,
   GitCommit,
   InitGitRepo,
+  OpenBrowser,
   OpenPlanetInVSCode,
   OpenProjectInVSCode,
   RestartServer,
@@ -36,6 +37,9 @@ import {
 } from '../wailsjs/go/main/App'
 
 export default class Go {
+  static app = {
+    openBrowser: OpenBrowser,
+  }
   static projects = {
     get: GetProjects,
     create: CreateProject,
