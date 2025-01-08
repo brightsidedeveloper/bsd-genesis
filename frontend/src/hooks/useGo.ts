@@ -23,7 +23,10 @@ export default function useGo<T>(
   const onErrorRef = useRef(opts?.onError)
   onErrorRef.current = opts?.onError
 
+  const [loading, setLoading] = useState(true)
+
   const refetch = useCallback(() => {
+    setLoading(true)
     fnRef
       .current()
       .then()
@@ -32,7 +35,12 @@ export default function useGo<T>(
         setState(v)
         onSuccessRef.current?.(v)
       })
+      .catch((e) => {
+        onErrorRef.current?.(e)
+      })
+      .finally(() => setLoading(false))
   }, [])
   useEffect(refetch, [refetch])
-  return [state, refetch] as const
+
+  return [state, refetch, loading] as const
 }

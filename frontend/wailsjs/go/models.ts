@@ -121,6 +121,22 @@ export namespace main {
 	    }
 	}
 	
+	export class GitStashItem {
+	    index: number;
+	    hash: string;
+	    message: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new GitStashItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.index = source["index"];
+	        this.hash = source["hash"];
+	        this.message = source["message"];
+	    }
+	}
 	export class NewProjectOptions {
 	    dir: string;
 	    name: string;

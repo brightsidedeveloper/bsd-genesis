@@ -6,8 +6,16 @@ export function AddPlanetToProject(arg1, arg2) {
   return window['go']['main']['App']['AddPlanetToProject'](arg1, arg2);
 }
 
+export function ApplyStash(arg1, arg2) {
+  return window['go']['main']['App']['ApplyStash'](arg1, arg2);
+}
+
 export function ConnectDB(arg1) {
   return window['go']['main']['App']['ConnectDB'](arg1);
+}
+
+export function CreateBranch(arg1, arg2) {
+  return window['go']['main']['App']['CreateBranch'](arg1, arg2);
 }
 
 export function CreateProject(arg1) {
@@ -16,6 +24,10 @@ export function CreateProject(arg1) {
 
 export function CreateTable(arg1, arg2, arg3) {
   return window['go']['main']['App']['CreateTable'](arg1, arg2, arg3);
+}
+
+export function DeleteCurrentBranch(arg1) {
+  return window['go']['main']['App']['DeleteCurrentBranch'](arg1);
 }
 
 export function DeletePlanet(arg1, arg2) {
@@ -28,6 +40,14 @@ export function DeleteProject(arg1) {
 
 export function DeleteSQLQuery(arg1, arg2) {
   return window['go']['main']['App']['DeleteSQLQuery'](arg1, arg2);
+}
+
+export function DeleteStash(arg1, arg2) {
+  return window['go']['main']['App']['DeleteStash'](arg1, arg2);
+}
+
+export function DiscardChanges(arg1) {
+  return window['go']['main']['App']['DiscardChanges'](arg1);
 }
 
 export function DisconnectDB() {
@@ -50,8 +70,24 @@ export function GetActivePlanets(arg1) {
   return window['go']['main']['App']['GetActivePlanets'](arg1);
 }
 
+export function GetAllBranches(arg1) {
+  return window['go']['main']['App']['GetAllBranches'](arg1);
+}
+
+export function GetAllStashes(arg1) {
+  return window['go']['main']['App']['GetAllStashes'](arg1);
+}
+
 export function GetApex(arg1) {
   return window['go']['main']['App']['GetApex'](arg1);
+}
+
+export function GetCommitHistory(arg1, arg2) {
+  return window['go']['main']['App']['GetCommitHistory'](arg1, arg2);
+}
+
+export function GetCurrentBranch(arg1) {
+  return window['go']['main']['App']['GetCurrentBranch'](arg1);
 }
 
 export function GetDSN(arg1) {
@@ -106,6 +142,10 @@ export function LoadEnv() {
   return window['go']['main']['App']['LoadEnv']();
 }
 
+export function MergeBranch(arg1, arg2, arg3) {
+  return window['go']['main']['App']['MergeBranch'](arg1, arg2, arg3);
+}
+
 export function OpenBrowser(arg1) {
   return window['go']['main']['App']['OpenBrowser'](arg1);
 }
@@ -150,12 +190,20 @@ export function StartServer(arg1) {
   return window['go']['main']['App']['StartServer'](arg1);
 }
 
+export function StashChanges(arg1, arg2) {
+  return window['go']['main']['App']['StashChanges'](arg1, arg2);
+}
+
 export function StopDevServer(arg1, arg2) {
   return window['go']['main']['App']['StopDevServer'](arg1, arg2);
 }
 
 export function StopServer(arg1) {
   return window['go']['main']['App']['StopServer'](arg1);
+}
+
+export function SwitchBranch(arg1, arg2) {
+  return window['go']['main']['App']['SwitchBranch'](arg1, arg2);
 }
 
 export function UpdatePort(arg1, arg2) {

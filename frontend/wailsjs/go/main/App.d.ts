@@ -4,17 +4,27 @@ import {main} from '../models';
 
 export function AddPlanetToProject(arg1:string,arg2:string):Promise<void>;
 
+export function ApplyStash(arg1:string,arg2:number):Promise<void>;
+
 export function ConnectDB(arg1:string):Promise<void>;
+
+export function CreateBranch(arg1:string,arg2:string):Promise<void>;
 
 export function CreateProject(arg1:main.NewProjectOptions):Promise<void>;
 
 export function CreateTable(arg1:string,arg2:string,arg3:{[key: string]: string}):Promise<void>;
+
+export function DeleteCurrentBranch(arg1:string):Promise<void>;
 
 export function DeletePlanet(arg1:string,arg2:string):Promise<void>;
 
 export function DeleteProject(arg1:string):Promise<void>;
 
 export function DeleteSQLQuery(arg1:string,arg2:string):Promise<void>;
+
+export function DeleteStash(arg1:string,arg2:number):Promise<void>;
+
+export function DiscardChanges(arg1:string):Promise<void>;
 
 export function DisconnectDB():Promise<void>;
 
@@ -26,7 +36,15 @@ export function GenerateCode(arg1:string):Promise<void>;
 
 export function GetActivePlanets(arg1:string):Promise<Array<main.ClientApp>>;
 
+export function GetAllBranches(arg1:string):Promise<Array<string>>;
+
+export function GetAllStashes(arg1:string):Promise<Array<main.GitStashItem>>;
+
 export function GetApex(arg1:string):Promise<main.ApexData>;
+
+export function GetCommitHistory(arg1:string,arg2:number):Promise<Array<string>>;
+
+export function GetCurrentBranch(arg1:string):Promise<string>;
 
 export function GetDSN(arg1:string):Promise<string>;
 
@@ -54,6 +72,8 @@ export function InitGitRepo(arg1:string):Promise<void>;
 
 export function LoadEnv():Promise<void>;
 
+export function MergeBranch(arg1:string,arg2:string,arg3:string):Promise<void>;
+
 export function OpenBrowser(arg1:string):Promise<void>;
 
 export function OpenPlanetInVSCode(arg1:string,arg2:string):Promise<void>;
@@ -76,8 +96,12 @@ export function StartDevServer(arg1:string,arg2:string):Promise<string>;
 
 export function StartServer(arg1:string):Promise<void>;
 
+export function StashChanges(arg1:string,arg2:string):Promise<void>;
+
 export function StopDevServer(arg1:string,arg2:string):Promise<string>;
 
 export function StopServer(arg1:string):Promise<void>;
+
+export function SwitchBranch(arg1:string,arg2:string):Promise<void>;
 
 export function UpdatePort(arg1:string,arg2:string):Promise<void>;
