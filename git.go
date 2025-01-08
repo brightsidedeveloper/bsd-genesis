@@ -348,6 +348,12 @@ func (a *App) StashChanges(dir, message string) error {
 		return fmt.Errorf("%v", err)
 	}
 
+	if err := wt.AddWithOptions(&git.AddOptions{All: true}); err != nil {
+		return fmt.Errorf("%v", err)
+	}
+
+	fmt.Println("✅ All changes staged!")
+
 	// Commit the current state to stash
 	commit, err := wt.Commit(fmt.Sprintf("Stash: %s", message), &git.CommitOptions{
 		Author: &object.Signature{
@@ -497,9 +503,9 @@ func (a *App) MergeBranch(dir, targetBranch, sourceBranch string) error {
 	err := mergeCmd.Run()
 	if err != nil {
 		// If there is a conflict, open VS Code
-		fmt.Println("❌ Merge conflict detected! Opening VS Code for manual resolution...")
+		fmt.Println(" Merge conflict detected! Opening VS Code for manual resolution...")
 		a.OpenProjectInVSCode(dir)
-		return fmt.Errorf("merge conflict. Resolve conflicts manually in VS Code.")
+		return fmt.Errorf("merge conflict. Resolve conflicts manually in VS Code")
 	}
 
 	fmt.Println("✅ Successfully merged", sourceBranch, "into", targetBranch)
