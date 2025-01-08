@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import Go from '@/Go'
+import useGo from '@/hooks/useGo'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { ZodSchema } from 'zod'
 
 export const Route = createLazyFileRoute('/_layout/settings')({
   component: RouteComponent,
@@ -32,40 +31,4 @@ function RouteComponent() {
       </div>{' '}
     </div>
   )
-}
-
-function useGo<T>(
-  initialValue: T,
-  fn: () => Promise<T>,
-  opts?: {
-    schema?: ZodSchema<T>
-    onSuccess?: (v: T) => void
-    onError?: (e: Error) => void
-  }
-) {
-  const [state, setState] = useState(initialValue)
-  const fnRef = useRef(fn)
-  fnRef.current = fn
-
-  const schemaRef = useRef(opts?.schema)
-  schemaRef.current = opts?.schema
-
-  const onSuccessRef = useRef(opts?.onSuccess)
-  onSuccessRef.current = opts?.onSuccess
-
-  const onErrorRef = useRef(opts?.onError)
-  onErrorRef.current = opts?.onError
-
-  const refetch = useCallback(() => {
-    fnRef
-      .current()
-      .then()
-      .then((v) => {
-        v = schemaRef.current?.parse(v) ?? v
-        setState(v)
-        onSuccessRef.current?.(v)
-      })
-  }, [])
-  useEffect(refetch, [refetch])
-  return [state, refetch] as const
 }

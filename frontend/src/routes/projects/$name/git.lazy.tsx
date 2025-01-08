@@ -78,14 +78,13 @@ function useGit() {
     Go.git.status(dir).then(setStatus).catch(console.error)
   }, [dir])
   useEffect(refetch, [refetch])
-
+  //Use Go!
   const [branch, setBranch] = useState('')
   const [commit, setCommit] = useState('')
   const [remote, setRemote] = useState('')
 
   const [branches, setBranches] = useState<string[]>([])
   const [commits, setCommits] = useState<string[]>([])
-  console.log(status)
   return {
     status: parseGitStatus(status.split('\n')),
     clean: !status,
