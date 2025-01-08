@@ -62,6 +62,10 @@ export function GetDevServersStatus(arg1) {
   return window['go']['main']['App']['GetDevServersStatus'](arg1);
 }
 
+export function GetEnvVariable(arg1) {
+  return window['go']['main']['App']['GetEnvVariable'](arg1);
+}
+
 export function GetGitStatus(arg1) {
   return window['go']['main']['App']['GetGitStatus'](arg1);
 }
@@ -98,6 +102,10 @@ export function InitGitRepo(arg1) {
   return window['go']['main']['App']['InitGitRepo'](arg1);
 }
 
+export function LoadEnv() {
+  return window['go']['main']['App']['LoadEnv']();
+}
+
 export function OpenBrowser(arg1) {
   return window['go']['main']['App']['OpenBrowser'](arg1);
 }
@@ -110,6 +118,10 @@ export function OpenProjectInVSCode(arg1) {
   return window['go']['main']['App']['OpenProjectInVSCode'](arg1);
 }
 
+export function PickGenesisPath() {
+  return window['go']['main']['App']['PickGenesisPath']();
+}
+
 export function RestartServer(arg1) {
   return window['go']['main']['App']['RestartServer'](arg1);
 }
@@ -120,6 +132,10 @@ export function RunBash(arg1, arg2, arg3) {
 
 export function SaveApex(arg1, arg2) {
   return window['go']['main']['App']['SaveApex'](arg1, arg2);
+}
+
+export function SaveEnvVariable(arg1, arg2) {
+  return window['go']['main']['App']['SaveEnvVariable'](arg1, arg2);
 }
 
 export function SaveSQLQuery(arg1, arg2) {

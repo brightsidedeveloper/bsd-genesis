@@ -18,14 +18,14 @@ type ProjectInfo struct {
 }
 
 func (a *App) GetProjects() []ProjectInfo {
-	if err := ensureDir(a.ProjectsDir); err != nil {
+	if err := ensureDir(getSolarDir(a.ProjectsDir)); err != nil {
 		fmt.Println("❌ Error ensuring projects directory:", err)
 		return nil
 	}
 
-	fmt.Println("🔍 Scanning projects from:", a.ProjectsDir)
+	fmt.Println("🔍 Scanning projects from:", getSolarDir(a.ProjectsDir))
 
-	projects, err := getProjectMetadata(a.ProjectsDir)
+	projects, err := getProjectMetadata(getSolarDir(a.ProjectsDir))
 
 	if err != nil {
 		fmt.Println("❌ Error getting project metadata:", err)
@@ -50,7 +50,7 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 		return err
 	}
 
-	projectPath := filepath.Join(a.ProjectsDir, o.Dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), o.Dir)
 
 	// Ensure the project directory does not already exist
 	if err := checkIfProjectExists(projectPath); err != nil {
@@ -103,7 +103,7 @@ func (a *App) DeleteProject(dir string) error {
 		return fmt.Errorf("❌ Project directory cannot be empty")
 	}
 
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 
 	// Ensure the directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
@@ -121,11 +121,11 @@ func (a *App) DeleteProject(dir string) error {
 
 // OpenProjectInVSCode opens the given project directory in VS Code
 func (a *App) OpenProjectInVSCode(dir string) error {
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 
 	// ✅ Ensure the directory exists
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
-		return fmt.Errorf("❌ Project '%s' does not exist in %s", dir, a.ProjectsDir)
+		return fmt.Errorf("❌ Project '%s' does not exist in %s", dir, getSolarDir(a.ProjectsDir))
 	}
 
 	// ✅ Open the project in VS Code

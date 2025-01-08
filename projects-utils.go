@@ -18,6 +18,10 @@ func ensureDir(dir string) error {
 	return nil
 }
 
+func getSolarDir(projectDir string) string {
+	return filepath.Join(projectDir, "genesis", "solar-systems")
+}
+
 // getProjectMetadata scans the directory and loads project metadata
 func getProjectMetadata(dir string) ([]ProjectInfo, error) {
 	var projects []ProjectInfo
@@ -81,10 +85,10 @@ func getProjectsPath() string {
 	}
 
 	if runtime.GOOS == "windows" {
-		return filepath.Join(homeDir, "Documents", "genesis", "projects")
+		return filepath.Join(homeDir, "Documents")
 	}
 
-	return filepath.Join(homeDir, "Developer", "genesis", "projects")
+	return filepath.Join(homeDir, "Developer")
 }
 
 func writeJSON(filePath string, data interface{}) error {

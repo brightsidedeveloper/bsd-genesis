@@ -13,6 +13,7 @@ import {
   GetActivePlanets,
   GetApex,
   GetDevServersStatus,
+  GetEnvVariable,
   GetGitStatus,
   GetPort,
   GetProjects,
@@ -25,9 +26,11 @@ import {
   OpenBrowser,
   OpenPlanetInVSCode,
   OpenProjectInVSCode,
+  PickGenesisPath,
   RestartServer,
   RunBash,
   SaveApex,
+  SaveEnvVariable,
   SaveSQLQuery,
   StartDevServer,
   StartServer,
@@ -39,12 +42,17 @@ import {
 export default class Go {
   static app = {
     openBrowser: OpenBrowser,
+    env: {
+      get: GetEnvVariable,
+      set: SaveEnvVariable,
+    },
   }
   static projects = {
     get: GetProjects,
     create: CreateProject,
     delete: DeleteProject,
     open: OpenProjectInVSCode,
+    changeDir: PickGenesisPath,
   }
   static server = {
     start: StartServer,

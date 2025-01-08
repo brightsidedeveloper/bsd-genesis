@@ -32,6 +32,8 @@ export function GetDSN(arg1:string):Promise<string>;
 
 export function GetDevServersStatus(arg1:string):Promise<main.DevServerStatus>;
 
+export function GetEnvVariable(arg1:string):Promise<string>;
+
 export function GetGitStatus(arg1:string):Promise<string>;
 
 export function GetPort(arg1:string):Promise<string>;
@@ -50,17 +52,23 @@ export function GitCommit(arg1:string,arg2:string):Promise<void>;
 
 export function InitGitRepo(arg1:string):Promise<void>;
 
+export function LoadEnv():Promise<void>;
+
 export function OpenBrowser(arg1:string):Promise<void>;
 
 export function OpenPlanetInVSCode(arg1:string,arg2:string):Promise<void>;
 
 export function OpenProjectInVSCode(arg1:string):Promise<void>;
 
+export function PickGenesisPath():Promise<string>;
+
 export function RestartServer(arg1:string):Promise<void>;
 
 export function RunBash(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function SaveApex(arg1:string,arg2:main.ApexData):Promise<void>;
+
+export function SaveEnvVariable(arg1:string,arg2:string):Promise<void>;
 
 export function SaveSQLQuery(arg1:string,arg2:string):Promise<void>;
 

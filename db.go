@@ -17,7 +17,7 @@ import (
 
 func (a *App) GetDSN(dir string) (string, error) {
 
-	projectPath := filepath.Join(a.ProjectsDir, dir, dir+"-star")
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir, dir+"-star")
 	envFilePath := filepath.Join(projectPath, ".env")
 
 	// ✅ Ensure .env file exists

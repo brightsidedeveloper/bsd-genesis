@@ -41,7 +41,7 @@ type Operation struct {
 
 func (a *App) GetApex(dir string) (*ApexData, error) {
 	// Load apex.json file
-	data, err := getApexData(filepath.Join(a.ProjectsDir, dir))
+	data, err := getApexData(filepath.Join(getSolarDir(a.ProjectsDir), dir))
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (a *App) GetApex(dir string) (*ApexData, error) {
 
 func (a *App) SaveApex(dir string, apexData ApexData) error {
 	// Define the file path
-	apexFilePath := filepath.Join(a.ProjectsDir, dir, "apex.json")
+	apexFilePath := filepath.Join(getSolarDir(a.ProjectsDir), dir, "apex.json")
 
 	// Marshal ApexData into formatted JSON
 	jsonData, err := json.MarshalIndent(apexData, "", "  ")
@@ -75,7 +75,7 @@ func (a *App) GenerateCode(dir string) error {
 		return err
 	}
 
-	projectDir := a.ProjectsDir
+	projectDir := getSolarDir(a.ProjectsDir)
 	a.mu.Unlock()
 	port := a.GetPort(dir)
 	a.mu.Lock()

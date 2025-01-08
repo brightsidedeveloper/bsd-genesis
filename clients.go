@@ -25,7 +25,7 @@ func (a *App) AddPlanetToProject(dir, planetType string) error {
 		return fmt.Errorf("❌ Invalid planet type: %s. Must be 'web', 'mobile', or 'desktop'", planetType)
 	}
 
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 	planetsPath := filepath.Join(projectPath, "planets")
 	planetDestPath := filepath.Join(planetsPath, planetType)
 
@@ -57,7 +57,7 @@ type ClientApp struct {
 }
 
 func (a *App) GetActivePlanets(dir string) ([]ClientApp, error) {
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 	planetsPath := filepath.Join(projectPath, "planets")
 
 	// ✅ Ensure the planets directory exists
@@ -114,7 +114,7 @@ func (a *App) OpenPlanetInVSCode(dir, planetType string) error {
 	}
 
 	// ✅ Construct the path to the planet directory
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 	planetPath := filepath.Join(projectPath, "planets", planetType)
 
 	// ✅ Ensure the directory exists before opening
@@ -150,7 +150,7 @@ func (a *App) DeletePlanet(dir, planetType string) error {
 	}
 
 	// ✅ Construct the path to the planet directory
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 	planetPath := filepath.Join(projectPath, "planets", planetType)
 
 	// ✅ Ensure the directory exists
@@ -180,7 +180,7 @@ func (a *App) RunBash(dir, planetType, cmd string) string {
 	}
 
 	// ✅ Construct the path to the planet directory
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 	planetPath := filepath.Join(projectPath, "planets", planetType)
 
 	// ✅ Ensure the directory exists
@@ -209,7 +209,7 @@ func (a *App) StartDevServer(dir, planetType string) (string, error) {
 	}
 
 	// ✅ Construct the path to the planet directory
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 	planetPath := filepath.Join(projectPath, "planets", planetType)
 
 	// ✅ Ensure the directory exists
@@ -291,7 +291,7 @@ func (a *App) StopDevServer(dir, planetType string) (string, error) {
 
 	fmt.Println("🔍 Searching for running dev servers for:", planetType, "in project", dir)
 
-	projectPath := filepath.Join(a.ProjectsDir, dir, "planets", planetType)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir, "planets", planetType)
 
 	// 🔍 Find all running processes related to this project
 	cmd := exec.Command("ps", "aux")
@@ -333,7 +333,7 @@ type DevServerStatus struct {
 }
 
 func (a *App) GetDevServersStatus(dir string) DevServerStatus {
-	projectPath := filepath.Join(a.ProjectsDir, dir, "planets")
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir, "planets")
 
 	return DevServerStatus{
 		Web:     isDevServerRunning(filepath.Join(projectPath, "web")),

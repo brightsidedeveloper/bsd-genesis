@@ -12,7 +12,7 @@ import (
 )
 
 func (a *App) InitGitRepo(dir string) error {
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 
 	// Check if .git exists
 	if _, err := os.Stat(filepath.Join(projectPath, ".git")); err == nil {
@@ -31,7 +31,7 @@ func (a *App) InitGitRepo(dir string) error {
 
 // GetGitStatus retrieves the current Git status
 func (a *App) GetGitStatus(dir string) (string, error) {
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 
 	// Open the repository
 	repo, err := git.PlainOpen(projectPath)
@@ -54,7 +54,7 @@ func (a *App) GetGitStatus(dir string) (string, error) {
 }
 
 func (a *App) GitCommit(dir, message string) error {
-	projectPath := filepath.Join(a.ProjectsDir, dir)
+	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 
 	repo, err := git.PlainOpen(projectPath)
 	if err != nil {
