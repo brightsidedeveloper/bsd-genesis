@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 )
@@ -146,40 +147,28 @@ func checkIfProjectExists(projectPath string) error {
 // 	return nil
 // }
 
-func copyTemplate(srcDir, destDir string) error {
-	if err := ensureDir(destDir); err != nil {
-		return err
+func cloneRepoAndPrepare(repoURL, destDir string) error {
+	// Ensure the destination directory does not already exist
+	if _, err := os.Stat(destDir); !os.IsNotExist(err) {
+		return fmt.Errorf("❌ Destination directory '%s' already exists", destDir)
 	}
 
-	err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// ✅ Skip `.git` and `node_modules/`
-		base := filepath.Base(path)
-		if info.IsDir() && (base == ".git" || base == "node_modules") {
-			fmt.Println("🚫 Skipping directory:", path)
-			return filepath.SkipDir
-		}
-
-		relPath, err := filepath.Rel(srcDir, path)
-		if err != nil {
-			return err
-		}
-		destPath := filepath.Join(destDir, relPath)
-
-		if info.IsDir() {
-			return ensureDir(destPath)
-		}
-		return copyFile(path, destPath)
-	})
-
-	if err != nil {
-		return fmt.Errorf("❌ Error copying template: %v", err)
+	// Clone the repository
+	fmt.Println("🚀 Cloning repository:", repoURL, "to", destDir)
+	cmd := exec.Command("git", "clone", "--depth", "1", repoURL, destDir)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("❌ Failed to clone repository: %v", err)
 	}
 
-	fmt.Println("✅ Template copied successfully!")
+	// Remove the .git directory
+	gitDir := filepath.Join(destDir, ".git")
+	if err := os.RemoveAll(gitDir); err != nil {
+		return fmt.Errorf("❌ Failed to remove .git directory: %v", err)
+	}
+
+	fmt.Println("✅ Repository cloned and .git folder removed successfully!")
 	return nil
 }
 

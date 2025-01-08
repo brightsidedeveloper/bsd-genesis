@@ -57,10 +57,13 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 		return err
 	}
 
-	// Copy project template to new directory
-	templatePath := filepath.Join("universe", "bsd-solar-system") // Change path if needed
-	if err := copyTemplate(templatePath, filepath.Join(projectPath, o.Dir+"-star")); err != nil {
-		return fmt.Errorf("❌ Failed to copy template: %v", err)
+	// Define the repo URL for the solar system template
+	repoURL := "https://github.com/brightsidedeveloper/bsd-solar-system.git"
+	destPath := filepath.Join(projectPath, o.Dir+"-star")
+
+	// Clone project template from GitHub
+	if err := cloneRepoAndPrepare(repoURL, destPath); err != nil {
+		return fmt.Errorf("❌ Failed to clone project template: %v", err)
 	}
 
 	// Create and write project.json with correct metadata
@@ -93,6 +96,9 @@ func (a *App) CreateProject(o NewProjectOptions) error {
 	if err := writeJSON(sqlEditorFilePath, sqlHistory); err != nil {
 		return fmt.Errorf("❌ Failed to write sql-editor.json: %v", err)
 	}
+
+	a.InitGitRepo(o.Dir)
+	a.GitCommit(o.Dir, "Initial commit")
 
 	fmt.Println("✅ Project successfully created at:", projectPath)
 	return nil

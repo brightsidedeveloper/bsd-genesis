@@ -13,7 +13,6 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ProjectsNameGitImport } from './routes/projects/$name/git'
 
 // Create Virtual Routes
 
@@ -41,6 +40,7 @@ const ProjectsNameQ1LazyImport = createFileRoute('/projects/$name/q1')()
 const ProjectsNameGithubActionsLazyImport = createFileRoute(
   '/projects/$name/github-actions',
 )()
+const ProjectsNameGitLazyImport = createFileRoute('/projects/$name/git')()
 const ProjectsNameEndpointsLazyImport = createFileRoute(
   '/projects/$name/endpoints',
 )()
@@ -193,6 +193,14 @@ const ProjectsNameGithubActionsLazyRoute =
     import('./routes/projects/$name/github-actions.lazy').then((d) => d.Route),
   )
 
+const ProjectsNameGitLazyRoute = ProjectsNameGitLazyImport.update({
+  id: '/git',
+  path: '/git',
+  getParentRoute: () => ProjectsNameRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/git.lazy').then((d) => d.Route),
+)
+
 const ProjectsNameEndpointsLazyRoute = ProjectsNameEndpointsLazyImport.update({
   id: '/endpoints',
   path: '/endpoints',
@@ -231,14 +239,6 @@ const ProjectsNameApexLazyRoute = ProjectsNameApexLazyImport.update({
   getParentRoute: () => ProjectsNameRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/projects/$name/apex.lazy').then((d) => d.Route),
-)
-
-const ProjectsNameGitRoute = ProjectsNameGitImport.update({
-  id: '/git',
-  path: '/git',
-  getParentRoute: () => ProjectsNameRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/projects/$name/git.lazy').then((d) => d.Route),
 )
 
 // Populate the FileRoutesByPath interface
@@ -308,13 +308,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexLazyImport
       parentRoute: typeof LayoutRouteLazyImport
     }
-    '/projects/$name/git': {
-      id: '/projects/$name/git'
-      path: '/git'
-      fullPath: '/projects/$name/git'
-      preLoaderRoute: typeof ProjectsNameGitImport
-      parentRoute: typeof ProjectsNameRouteLazyImport
-    }
     '/projects/$name/apex': {
       id: '/projects/$name/apex'
       path: '/apex'
@@ -348,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/endpoints'
       fullPath: '/projects/$name/endpoints'
       preLoaderRoute: typeof ProjectsNameEndpointsLazyImport
+      parentRoute: typeof ProjectsNameRouteLazyImport
+    }
+    '/projects/$name/git': {
+      id: '/projects/$name/git'
+      path: '/git'
+      fullPath: '/projects/$name/git'
+      preLoaderRoute: typeof ProjectsNameGitLazyImport
       parentRoute: typeof ProjectsNameRouteLazyImport
     }
     '/projects/$name/github-actions': {
@@ -443,12 +443,12 @@ const LayoutRouteLazyRouteWithChildren = LayoutRouteLazyRoute._addFileChildren(
 )
 
 interface ProjectsNameRouteLazyRouteChildren {
-  ProjectsNameGitRoute: typeof ProjectsNameGitRoute
   ProjectsNameApexLazyRoute: typeof ProjectsNameApexLazyRoute
   ProjectsNameAuthLazyRoute: typeof ProjectsNameAuthLazyRoute
   ProjectsNameClientsLazyRoute: typeof ProjectsNameClientsLazyRoute
   ProjectsNameDeployLazyRoute: typeof ProjectsNameDeployLazyRoute
   ProjectsNameEndpointsLazyRoute: typeof ProjectsNameEndpointsLazyRoute
+  ProjectsNameGitLazyRoute: typeof ProjectsNameGitLazyRoute
   ProjectsNameGithubActionsLazyRoute: typeof ProjectsNameGithubActionsLazyRoute
   ProjectsNameQ1LazyRoute: typeof ProjectsNameQ1LazyRoute
   ProjectsNameQueriesLazyRoute: typeof ProjectsNameQueriesLazyRoute
@@ -461,12 +461,12 @@ interface ProjectsNameRouteLazyRouteChildren {
 }
 
 const ProjectsNameRouteLazyRouteChildren: ProjectsNameRouteLazyRouteChildren = {
-  ProjectsNameGitRoute: ProjectsNameGitRoute,
   ProjectsNameApexLazyRoute: ProjectsNameApexLazyRoute,
   ProjectsNameAuthLazyRoute: ProjectsNameAuthLazyRoute,
   ProjectsNameClientsLazyRoute: ProjectsNameClientsLazyRoute,
   ProjectsNameDeployLazyRoute: ProjectsNameDeployLazyRoute,
   ProjectsNameEndpointsLazyRoute: ProjectsNameEndpointsLazyRoute,
+  ProjectsNameGitLazyRoute: ProjectsNameGitLazyRoute,
   ProjectsNameGithubActionsLazyRoute: ProjectsNameGithubActionsLazyRoute,
   ProjectsNameQ1LazyRoute: ProjectsNameQ1LazyRoute,
   ProjectsNameQueriesLazyRoute: ProjectsNameQueriesLazyRoute,
@@ -493,12 +493,12 @@ export interface FileRoutesByFullPath {
   '/universe': typeof LayoutUniverseLazyRoute
   '/wormholes': typeof LayoutWormholesLazyRoute
   '/': typeof LayoutIndexLazyRoute
-  '/projects/$name/git': typeof ProjectsNameGitRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
+  '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/github-actions': typeof ProjectsNameGithubActionsLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
@@ -518,12 +518,12 @@ export interface FileRoutesByTo {
   '/universe': typeof LayoutUniverseLazyRoute
   '/wormholes': typeof LayoutWormholesLazyRoute
   '/': typeof LayoutIndexLazyRoute
-  '/projects/$name/git': typeof ProjectsNameGitRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
+  '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/github-actions': typeof ProjectsNameGithubActionsLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
@@ -546,12 +546,12 @@ export interface FileRoutesById {
   '/_layout/universe': typeof LayoutUniverseLazyRoute
   '/_layout/wormholes': typeof LayoutWormholesLazyRoute
   '/_layout/': typeof LayoutIndexLazyRoute
-  '/projects/$name/git': typeof ProjectsNameGitRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
+  '/projects/$name/git': typeof ProjectsNameGitLazyRoute
   '/projects/$name/github-actions': typeof ProjectsNameGithubActionsLazyRoute
   '/projects/$name/q1': typeof ProjectsNameQ1LazyRoute
   '/projects/$name/queries': typeof ProjectsNameQueriesLazyRoute
@@ -575,12 +575,12 @@ export interface FileRouteTypes {
     | '/universe'
     | '/wormholes'
     | '/'
-    | '/projects/$name/git'
     | '/projects/$name/apex'
     | '/projects/$name/auth'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
     | '/projects/$name/endpoints'
+    | '/projects/$name/git'
     | '/projects/$name/github-actions'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
@@ -599,12 +599,12 @@ export interface FileRouteTypes {
     | '/universe'
     | '/wormholes'
     | '/'
-    | '/projects/$name/git'
     | '/projects/$name/apex'
     | '/projects/$name/auth'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
     | '/projects/$name/endpoints'
+    | '/projects/$name/git'
     | '/projects/$name/github-actions'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
@@ -625,12 +625,12 @@ export interface FileRouteTypes {
     | '/_layout/universe'
     | '/_layout/wormholes'
     | '/_layout/'
-    | '/projects/$name/git'
     | '/projects/$name/apex'
     | '/projects/$name/auth'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
     | '/projects/$name/endpoints'
+    | '/projects/$name/git'
     | '/projects/$name/github-actions'
     | '/projects/$name/q1'
     | '/projects/$name/queries'
@@ -682,12 +682,12 @@ export const routeTree = rootRoute
     "/projects/$name": {
       "filePath": "projects/$name/route.lazy.tsx",
       "children": [
-        "/projects/$name/git",
         "/projects/$name/apex",
         "/projects/$name/auth",
         "/projects/$name/clients",
         "/projects/$name/deploy",
         "/projects/$name/endpoints",
+        "/projects/$name/git",
         "/projects/$name/github-actions",
         "/projects/$name/q1",
         "/projects/$name/queries",
@@ -727,10 +727,6 @@ export const routeTree = rootRoute
       "filePath": "_layout/index.lazy.tsx",
       "parent": "/_layout"
     },
-    "/projects/$name/git": {
-      "filePath": "projects/$name/git.ts",
-      "parent": "/projects/$name"
-    },
     "/projects/$name/apex": {
       "filePath": "projects/$name/apex.lazy.tsx",
       "parent": "/projects/$name"
@@ -749,6 +745,10 @@ export const routeTree = rootRoute
     },
     "/projects/$name/endpoints": {
       "filePath": "projects/$name/endpoints.lazy.tsx",
+      "parent": "/projects/$name"
+    },
+    "/projects/$name/git": {
+      "filePath": "projects/$name/git.lazy.tsx",
       "parent": "/projects/$name"
     },
     "/projects/$name/github-actions": {

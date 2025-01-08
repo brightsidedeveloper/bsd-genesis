@@ -12,15 +12,15 @@ import (
 )
 
 func (a *App) AddPlanetToProject(dir, planetType string) error {
-	// Validate input
+	// Define valid planets and their repo URLs
 	validPlanets := map[string]string{
-		"web":     "bsd-planet-web",
-		"mobile":  "bsd-planet-mobile",
-		"desktop": "bsd-planet-desktop",
+		"web":     "https://github.com/brightsidedeveloper/bsd-planet-web.git",
+		"mobile":  "https://github.com/brightsidedeveloper/bsd-planet-mobile.git",
+		"desktop": "https://github.com/brightsidedeveloper/bsd-planet-desktop.git",
 	}
 
-	// Check if the planet type is valid
-	planetTemplate, exists := validPlanets[planetType]
+	// Validate the planet type
+	repoURL, exists := validPlanets[planetType]
 	if !exists {
 		return fmt.Errorf("❌ Invalid planet type: %s. Must be 'web', 'mobile', or 'desktop'", planetType)
 	}
@@ -39,12 +39,9 @@ func (a *App) AddPlanetToProject(dir, planetType string) error {
 		return fmt.Errorf("❌ Planet '%s' already exists in project '%s'", planetType, dir)
 	}
 
-	// Define the source template path
-	templatePath := filepath.Join("universe", planetTemplate)
-
-	// Copy the planet template to the project's planets folder
-	if err := copyTemplate(templatePath, planetDestPath); err != nil {
-		return fmt.Errorf("❌ Failed to copy planet template: %v", err)
+	// Clone the planet template from GitHub
+	if err := cloneRepoAndPrepare(repoURL, planetDestPath); err != nil {
+		return fmt.Errorf("❌ Failed to clone planet template: %v", err)
 	}
 
 	fmt.Println("✅ Successfully added", planetType, "planet to project:", dir)

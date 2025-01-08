@@ -22,7 +22,6 @@ import {
   GetTables,
   GetTableSchema,
   GitCommit,
-  InitGitRepo,
   OpenBrowser,
   OpenPlanetInVSCode,
   OpenProjectInVSCode,
@@ -92,7 +91,6 @@ export default class Go {
     del: DeleteSQLQuery,
   }
   static git = {
-    init: InitGitRepo,
     status: GetGitStatus,
     commit: GitCommit,
   }

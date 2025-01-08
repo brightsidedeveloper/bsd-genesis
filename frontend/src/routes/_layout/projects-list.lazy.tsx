@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -21,20 +15,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  GetProjectsType,
-  GetProjectsSchema,
-  CreateProjectSchema,
-} from '@/types/schemas'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { GetProjectsType, GetProjectsSchema, CreateProjectSchema } from '@/types/schemas'
 import Go from '@/Go'
 import { nameToDir } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -53,10 +35,7 @@ function RouteComponent() {
 
   useEffect(refetch, [refetch])
 
-  const projectDirAndNameTuple = useMemo(
-    () => projects?.map(({ dir, project: { name } }) => [dir, name]) ?? [],
-    [projects],
-  )
+  const projectDirAndNameTuple = useMemo(() => projects?.map(({ dir, project: { name } }) => [dir, name]) ?? [], [projects])
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -79,27 +58,20 @@ function RouteComponent() {
             <Plus className="group-hover:opacity-100 opacity-70" />
           </Card>
         </DialogTrigger>
-        <CreateProject
-          refetch={refetch}
-          projectDirAndNameTuple={projectDirAndNameTuple}
-        />
+        <CreateProject refetch={refetch} projectDirAndNameTuple={projectDirAndNameTuple} />
       </Dialog>
     </div>
   )
 }
 
-function CreateProject({
-  refetch,
-  projectDirAndNameTuple,
-}: {
-  refetch: () => void
-  projectDirAndNameTuple: string[][]
-}) {
+function CreateProject({ refetch, projectDirAndNameTuple }: { refetch: () => void; projectDirAndNameTuple: string[][] }) {
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [database, setDatabase] = useState<'postgres' | ''>('')
+
+  const [loading, setLoading] = useState(false)
 
   function handleSubmit() {
     if (!name)
@@ -112,24 +84,18 @@ function CreateProject({
       })
     const trimmedName = name.trim()
     const dir = nameToDir(trimmedName)
-    if (
-      projectDirAndNameTuple.some(
-        ([d, n]) =>
-          d === dir || n.toLowerCase().includes(trimmedName.toLowerCase()),
-      )
-    )
+    if (projectDirAndNameTuple.some(([d, n]) => d === dir || n.toLowerCase().includes(trimmedName.toLowerCase())))
       return toast('Project Already Exists', {
         description: 'Please choose a different name.',
       })
-
     const project = CreateProjectSchema.parse({
       name: trimmedName,
       description,
       database,
       dir,
     })
-    console.log(project)
 
+    setLoading(true)
     Go.projects.create(project).then(() => {
       refetch()
       closeBtnRef.current?.click()
@@ -137,28 +103,22 @@ function CreateProject({
         description: 'Your project has been created.',
       })
     })
+
+    setLoading(false)
   }
 
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>New Project</DialogTitle>
-        <DialogDescription>
-          Name your project, choose a database and launch it!
-        </DialogDescription>
+        <DialogDescription>Name your project, choose a database and launch it!</DialogDescription>
       </DialogHeader>
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="name" className="text-right">
             Name
           </Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="BrightSide Portal"
-            className="col-span-3"
-          />
+          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="BrightSide Portal" className="col-span-3" />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="description" className="text-right">
@@ -174,10 +134,7 @@ function CreateProject({
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label className="text-right">Database</Label>
-          <Select
-            value={database}
-            onValueChange={(db: 'postgres') => setDatabase(db)}
-          >
+          <Select value={database} onValueChange={(db: 'postgres') => setDatabase(db)}>
             <SelectTrigger className="col-span-3">
               <SelectValue />
             </SelectTrigger>
@@ -191,12 +148,8 @@ function CreateProject({
         </div>
       </div>
       <DialogFooter>
-        <Button
-          onClick={handleSubmit}
-          type="submit"
-          disabled={!name || !database}
-        >
-          Save changes
+        <Button onClick={handleSubmit} type="submit" disabled={!name || !database || loading}>
+          Create
         </Button>
       </DialogFooter>
       <DialogClose className="hidden" ref={closeBtnRef} />
