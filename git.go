@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -481,52 +482,26 @@ func (a *App) DeleteStash(dir string, stashIndex int) error {
 func (a *App) MergeBranch(dir, targetBranch, sourceBranch string) error {
 	projectPath := filepath.Join(getSolarDir(a.ProjectsDir), dir)
 
-	// Open the Git repository
-	repo, err := git.PlainOpen(projectPath)
-	if err != nil {
-		return fmt.Errorf("%v", err)
-	}
+	// Ensure we are in the project directory
 
-	wt, err := repo.Worktree()
-	if err != nil {
-		return fmt.Errorf("%v", err)
-	}
-
-	// Checkout the target branch
-	err = wt.Checkout(&git.CheckoutOptions{
-		Branch: plumbing.NewBranchReferenceName(targetBranch),
-	})
-	if err != nil {
+	if err := a.SwitchBranch(dir, targetBranch); err != nil {
 		return fmt.Errorf("%v", err)
 	}
 
 	fmt.Println("✅ Switched to target branch:", targetBranch)
 
-	// Get reference of the source branch
-	sourceRef, err := repo.Reference(plumbing.NewBranchReferenceName(sourceBranch), true)
+	// Execute `git merge sourceBranch`
+	mergeCmd := exec.Command("git", "-C", projectPath, "merge", sourceBranch)
+	mergeCmd.Stdout = os.Stdout
+	mergeCmd.Stderr = os.Stderr
+	err := mergeCmd.Run()
 	if err != nil {
-		return fmt.Errorf("%v", err)
+		// If there is a conflict, open VS Code
+		fmt.Println("❌ Merge conflict detected! Opening VS Code for manual resolution...")
+		a.OpenProjectInVSCode(dir)
+		return fmt.Errorf("merge conflict. Resolve conflicts manually in VS Code.")
 	}
 
-	// Get latest commit from source branch
-	sourceCommit, err := repo.CommitObject(sourceRef.Hash())
-	if err != nil {
-		return fmt.Errorf("❌ Failed to get latest commit from '%s': %v", sourceBranch, err)
-	}
-
-	// Create a new merge commit
-	_, err = wt.Commit(fmt.Sprintf("Merge branch '%s' into '%s'", sourceBranch, targetBranch), &git.CommitOptions{
-		Parents: []plumbing.Hash{sourceCommit.Hash},
-		Author: &object.Signature{
-			Name:  "Genesis",
-			Email: "tim@brightsidedeveloper.com",
-			When:  time.Now(),
-		},
-	})
-	if err != nil {
-		return fmt.Errorf(" Merge commit failed: %v", err)
-	}
-
-	fmt.Println("✅ Merged branch", sourceBranch, "into", targetBranch)
+	fmt.Println("✅ Successfully merged", sourceBranch, "into", targetBranch)
 	return nil
 }

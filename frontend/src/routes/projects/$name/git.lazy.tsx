@@ -45,6 +45,10 @@ function RouteComponent() {
   const closeRef = useRef<HTMLButtonElement>(null)
   const closeDeleteRef = useRef<HTMLButtonElement>(null)
   const closeStashRef = useRef<HTMLButtonElement>(null)
+  const closeMergeRef = useRef<HTMLButtonElement>(null)
+
+  const [target, setTarget] = useState('')
+  const [source, setSource] = useState('')
 
   return (
     <div className="flex flex-col gap-4">
@@ -184,9 +188,69 @@ function RouteComponent() {
                 <DialogTitle>Make a merge</DialogTitle>
                 <DialogDescription>Select a target and a source.</DialogDescription>
               </DialogHeader>
+              <div className="grid grid-cols-2 items-center gap-y-2 gap-x-4">
+                <Label>Source</Label>
+                <Label>Target</Label>
+                <Select value={source} onValueChange={(v) => setSource(v)}>
+                  <SelectTrigger>
+                    <SelectValue>{source}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {branches.map((b) => (
+                        <SelectItem key={b} value={b}>
+                          {b}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <Select value={target} onValueChange={(v) => setTarget(v)}>
+                  <SelectTrigger>
+                    <SelectValue>{target}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {branches.map((b) => (
+                        <SelectItem key={b} value={b}>
+                          {b}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
               <DialogFooter>
-                <DialogClose ref={closeDeleteRef} />
-                <Button onClick={() => {}}>Merge</Button>
+                <DialogClose ref={closeMergeRef} />
+                <Button
+                  onClick={() => {
+                    Go.git
+                      .mergeBranch(dir, target, source)
+                      .then(() => {
+                        refetchBranch()
+                        refetchStatus()
+                        refetchCommits()
+                        refetchBranches()
+                        loadApex(dir)
+                        Go.server.status(dir).then((status) => {
+                          if (GetServerStatusSchema.parse(status).server === 'running')
+                            Go.server
+                              .restartServer(dir)
+                              .then(() => {
+                                toast.success('Server restarted')
+                              })
+                              .catch(() => toast.error('Failed to restart server'))
+                        })
+                        closeMergeRef.current?.click()
+                      })
+                      .catch((e) => {
+                        toast.error('Failed to merge', { description: e })
+                      })
+                  }}
+                  disabled={!target || !source || target === source}
+                >
+                  Merge
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
