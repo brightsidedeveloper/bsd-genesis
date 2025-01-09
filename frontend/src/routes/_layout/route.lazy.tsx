@@ -10,7 +10,10 @@ export const Route = createLazyFileRoute('/_layout')({
 
 function RouteComponent() {
   const pathname = useLocation().pathname
-  const label = useMemo(() => routes.find((r) => r.to === pathname)?.label ?? 'Unknown', [pathname])
+  const label = useMemo(
+    () => routes.find((r) => r.to === pathname)?.label ?? (pathname === '/settings' ? 'Settings' : 'Unknown'),
+    [pathname]
+  )
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-card border-b pl-52 py-2 flex justify-between items-center">

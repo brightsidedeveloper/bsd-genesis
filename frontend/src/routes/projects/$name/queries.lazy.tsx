@@ -30,6 +30,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { createPortal } from 'react-dom'
 import { Trash } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import A from '@/features/apex/A'
 export const Route = createLazyFileRoute('/projects/$name/queries')({
   component: RouteComponent,
 })
@@ -73,7 +74,9 @@ function RouteComponent() {
       {tab === 'queries' ? (
         <>
           <div className="flex">
-            <div className="flex-1 pr-4"></div>
+            <div className="flex-1 pr-4">
+              <A />
+            </div>
             <ScrollArea className="w-52 h-[calc(100vh-var(--header-height)-40px-64px)] border-l px-4 flex flex-col gap-2">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-semibold">Queries</h3>

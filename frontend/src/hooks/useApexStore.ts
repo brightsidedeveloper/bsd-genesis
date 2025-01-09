@@ -54,6 +54,16 @@ export const SchemaSchema = z.discriminatedUnion('type', [QuerySchema, BodySchem
 export const MethodEnumSchema = z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
 export type MethodEnumType = z.infer<typeof MethodEnumSchema>
 
+// ✅ Handler Schema
+export const HandlerSchema = z.object({
+  name: z.string(),
+})
+
+// ✅ Query Schema
+export const DBQuerySchema = z.object({
+  name: z.string(),
+})
+
 // ✅ Operation Schema
 export const OperationSchema = z
   .object({
@@ -62,6 +72,8 @@ export const OperationSchema = z
     method: MethodEnumSchema, // Ensure valid HTTP methods
     querySchema: z.string().optional(),
     bodySchema: z.string().optional(),
+    queryName: z.string().optional(),
+    handlerName: z.string().optional(),
     responseSchema: z.string(), // Required field
   })
   .refine(
@@ -94,11 +106,15 @@ export const ApexSchema = z.object({
   endpoints: z.array(EndpointSchema),
   schemas: z.array(SchemaSchema),
   operations: z.array(OperationSchema),
+  handlers: z.array(HandlerSchema),
+  queries: z.array(DBQuerySchema),
 })
 
 export type EndpointType = z.infer<typeof EndpointSchema>
 export type QuerySchemaType = z.infer<typeof QuerySchema>
 export type BodySchemaType = z.infer<typeof BodySchema>
+export type DBQuerySchemaType = z.infer<typeof DBQuerySchema>
+export type HandlerSchemaType = z.infer<typeof HandlerSchema>
 export type ResponseSchemaType = z.infer<typeof ResponseSchema>
 export type CustomSchemaType = z.infer<typeof CustomSchema>
 export type SchemaTypeTypes = QuerySchemaType | BodySchemaType | ResponseSchemaType | CustomSchemaType
@@ -119,6 +135,12 @@ interface ApexStore {
   addSchema: (schema: SchemaType) => void
   updateSchema: (name: string, updated: SchemaType) => void
   deleteSchema: (name: string) => void
+  addHandler: (handler: HandlerSchemaType) => void
+  updateHandler: (name: string, updated: HandlerSchemaType) => void
+  deleteHandler: (name: string) => void
+  addQuery: (query: DBQuerySchemaType) => void
+  updateQuery: (name: string, updated: DBQuerySchemaType) => void
+  deleteQuery: (name: string) => void
   addOperation: (operation: OperationType) => void
   updateOperation: (name: string, updated: OperationType) => void
   deleteOperation: (name: string) => void
@@ -126,11 +148,12 @@ interface ApexStore {
 }
 
 export const useApexStore = create<ApexStore>()((set, get) => ({
-  apex: { endpoints: [], schemas: [], operations: [] },
-  originalApex: { endpoints: [], schemas: [], operations: [] },
+  apex: { endpoints: [], schemas: [], operations: [], handlers: [], queries: [] },
+  originalApex: { endpoints: [], schemas: [], operations: [], handlers: [], queries: [] },
 
   reset: () => set({ apex: get().originalApex }),
-  clear: () => set({ apex: { endpoints: [], schemas: [], operations: [] } }),
+  clear: () => set({ apex: { endpoints: [], schemas: [], operations: [], handlers: [], queries: [] } }),
+
   // Load apex.json from backend
   loadApex: async (dir) => {
     try {
@@ -199,10 +222,47 @@ export const useApexStore = create<ApexStore>()((set, get) => ({
       operations.splice(index, 1)
       return { apex: { ...state.apex, operations } }
     }),
+  addHandler: (handler) => set((state) => ({ apex: { ...state.apex, handlers: [...state.apex.handlers, handler] } })),
+  updateHandler: (name, updated) =>
+    set((state) => {
+      const handlers = [...state.apex.handlers]
+      const index = handlers.findIndex((e) => e.name === name)
+      if (index === -1) return state
+      handlers[index] = updated
+      return { apex: { ...state.apex, handlers } }
+    }),
+  deleteHandler: (name) =>
+    set((state) => {
+      const handlers = [...state.apex.handlers]
+      const index = handlers.findIndex((e) => e.name === name)
+      if (index === -1) return state
+      handlers.splice(index, 1)
+      return { apex: { ...state.apex, handlers } }
+    }),
+
+  // CRUD Functions for Queries
+  addQuery: (query) => set((state) => ({ apex: { ...state.apex, queries: [...state.apex.queries, query] } })),
+  updateQuery: (name, updated) =>
+    set((state) => {
+      const queries = [...state.apex.queries]
+      const index = queries.findIndex((e) => e.name === name)
+      if (index === -1) return state
+      queries[index] = updated
+      return { apex: { ...state.apex, queries } }
+    }),
+  deleteQuery: (name) =>
+    set((state) => {
+      const queries = [...state.apex.queries]
+      const index = queries.findIndex((e) => e.name === name)
+      if (index === -1) return state
+      queries.splice(index, 1)
+      return { apex: { ...state.apex, queries } }
+    }),
 
   // Save changes to apex.json
   saveApex: async (dir) => {
     Go.apex
+      // @ts-expect-error Dumb error
       .save(dir, get().apex)
       .then(() => {
         toast.success('APEX data saved successfully')

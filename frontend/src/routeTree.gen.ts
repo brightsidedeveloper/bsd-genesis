@@ -48,6 +48,7 @@ const ProjectsNameDeployLazyImport = createFileRoute('/projects/$name/deploy')()
 const ProjectsNameClientsLazyImport = createFileRoute(
   '/projects/$name/clients',
 )()
+const ProjectsNameBlissLazyImport = createFileRoute('/projects/$name/bliss')()
 const ProjectsNameAuthLazyImport = createFileRoute('/projects/$name/auth')()
 const ProjectsNameApexLazyImport = createFileRoute('/projects/$name/apex')()
 
@@ -225,6 +226,14 @@ const ProjectsNameClientsLazyRoute = ProjectsNameClientsLazyImport.update({
   import('./routes/projects/$name/clients.lazy').then((d) => d.Route),
 )
 
+const ProjectsNameBlissLazyRoute = ProjectsNameBlissLazyImport.update({
+  id: '/bliss',
+  path: '/bliss',
+  getParentRoute: () => ProjectsNameRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/projects/$name/bliss.lazy').then((d) => d.Route),
+)
+
 const ProjectsNameAuthLazyRoute = ProjectsNameAuthLazyImport.update({
   id: '/auth',
   path: '/auth',
@@ -320,6 +329,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/projects/$name/auth'
       preLoaderRoute: typeof ProjectsNameAuthLazyImport
+      parentRoute: typeof ProjectsNameRouteLazyImport
+    }
+    '/projects/$name/bliss': {
+      id: '/projects/$name/bliss'
+      path: '/bliss'
+      fullPath: '/projects/$name/bliss'
+      preLoaderRoute: typeof ProjectsNameBlissLazyImport
       parentRoute: typeof ProjectsNameRouteLazyImport
     }
     '/projects/$name/clients': {
@@ -445,6 +461,7 @@ const LayoutRouteLazyRouteWithChildren = LayoutRouteLazyRoute._addFileChildren(
 interface ProjectsNameRouteLazyRouteChildren {
   ProjectsNameApexLazyRoute: typeof ProjectsNameApexLazyRoute
   ProjectsNameAuthLazyRoute: typeof ProjectsNameAuthLazyRoute
+  ProjectsNameBlissLazyRoute: typeof ProjectsNameBlissLazyRoute
   ProjectsNameClientsLazyRoute: typeof ProjectsNameClientsLazyRoute
   ProjectsNameDeployLazyRoute: typeof ProjectsNameDeployLazyRoute
   ProjectsNameEndpointsLazyRoute: typeof ProjectsNameEndpointsLazyRoute
@@ -463,6 +480,7 @@ interface ProjectsNameRouteLazyRouteChildren {
 const ProjectsNameRouteLazyRouteChildren: ProjectsNameRouteLazyRouteChildren = {
   ProjectsNameApexLazyRoute: ProjectsNameApexLazyRoute,
   ProjectsNameAuthLazyRoute: ProjectsNameAuthLazyRoute,
+  ProjectsNameBlissLazyRoute: ProjectsNameBlissLazyRoute,
   ProjectsNameClientsLazyRoute: ProjectsNameClientsLazyRoute,
   ProjectsNameDeployLazyRoute: ProjectsNameDeployLazyRoute,
   ProjectsNameEndpointsLazyRoute: ProjectsNameEndpointsLazyRoute,
@@ -495,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexLazyRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
+  '/projects/$name/bliss': typeof ProjectsNameBlissLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
@@ -520,6 +539,7 @@ export interface FileRoutesByTo {
   '/': typeof LayoutIndexLazyRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
+  '/projects/$name/bliss': typeof ProjectsNameBlissLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
@@ -548,6 +568,7 @@ export interface FileRoutesById {
   '/_layout/': typeof LayoutIndexLazyRoute
   '/projects/$name/apex': typeof ProjectsNameApexLazyRoute
   '/projects/$name/auth': typeof ProjectsNameAuthLazyRoute
+  '/projects/$name/bliss': typeof ProjectsNameBlissLazyRoute
   '/projects/$name/clients': typeof ProjectsNameClientsLazyRoute
   '/projects/$name/deploy': typeof ProjectsNameDeployLazyRoute
   '/projects/$name/endpoints': typeof ProjectsNameEndpointsLazyRoute
@@ -577,6 +598,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects/$name/apex'
     | '/projects/$name/auth'
+    | '/projects/$name/bliss'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
     | '/projects/$name/endpoints'
@@ -601,6 +623,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects/$name/apex'
     | '/projects/$name/auth'
+    | '/projects/$name/bliss'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
     | '/projects/$name/endpoints'
@@ -627,6 +650,7 @@ export interface FileRouteTypes {
     | '/_layout/'
     | '/projects/$name/apex'
     | '/projects/$name/auth'
+    | '/projects/$name/bliss'
     | '/projects/$name/clients'
     | '/projects/$name/deploy'
     | '/projects/$name/endpoints'
@@ -684,6 +708,7 @@ export const routeTree = rootRoute
       "children": [
         "/projects/$name/apex",
         "/projects/$name/auth",
+        "/projects/$name/bliss",
         "/projects/$name/clients",
         "/projects/$name/deploy",
         "/projects/$name/endpoints",
@@ -733,6 +758,10 @@ export const routeTree = rootRoute
     },
     "/projects/$name/auth": {
       "filePath": "projects/$name/auth.lazy.tsx",
+      "parent": "/projects/$name"
+    },
+    "/projects/$name/bliss": {
+      "filePath": "projects/$name/bliss.lazy.tsx",
       "parent": "/projects/$name"
     },
     "/projects/$name/clients": {

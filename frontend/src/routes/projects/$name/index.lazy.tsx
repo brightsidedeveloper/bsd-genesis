@@ -11,6 +11,7 @@ function RouteComponent() {
     <div>
       Hello {name}
       <br />
+      Genesis AI
       <br />
       <br />
       Todo: Put Kanban Here

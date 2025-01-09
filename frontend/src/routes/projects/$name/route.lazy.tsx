@@ -4,7 +4,7 @@ import {
   Aperture,
   ArrowLeft,
   Braces,
-  BugOff,
+  Cross,
   Database,
   Earth,
   GitGraph,
@@ -196,6 +196,7 @@ const routes = [
   { to: '/projects/$name/clients', label: 'Planets', Icon: Earth },
   { to: '/projects/$name/auth', label: 'Auth', Icon: Users },
   { to: '/projects/$name/tables', label: 'Tables', Icon: Table },
+  { to: '/projects/$name/bliss', label: 'Bliss', Icon: Cross },
   { to: '/projects/$name/queries', label: 'SQL', Icon: Keyboard },
   { to: '/projects/$name/schemas', label: 'Schemas', Icon: Braces },
   { to: '/projects/$name/endpoints', label: 'Endpoints', Icon: Signpost },
@@ -205,5 +206,5 @@ const routes = [
   { to: '/projects/$name/git', label: 'Git', Icon: GitGraph },
   { to: '/projects/$name/github-actions', label: 'Actions', Icon: Github },
   { to: '/projects/$name/deploy', label: 'Deploy', Icon: Ship },
-  { to: '/projects/$name/sentry', label: 'Logs', Icon: BugOff },
+  // { to: '/projects/$name/sentry', label: 'Logs', Icon: BugOff },
 ] as const
